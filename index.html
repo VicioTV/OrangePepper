@@ -1,0 +1,3888 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Orange Pepper — Coctelería de autor · Córdoba</title>
+  <meta name="description" content="Servicio de Cocteles de autor para eventos privados en Córdoba, Argentina. Ingredientes de estación. Hospitalidad como filosofía.">
+  <!-- Favicon / icons — naranja como ícono de marca en pestaña, accesos directos e iOS -->
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+  <link rel="shortcut icon" type="image/png" href="favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+  <!-- Preload del hero (LCP) -->
+  <link rel="preload" as="image" href="orangepepperphoto.webp" fetchpriority="high">
+  <meta name="theme-color" content="#070707">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <!-- Swiper.js -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+  <!-- GSAP -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
+  <!-- Lottie Web -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js" defer></script>
+  <!-- Swiper JS -->
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js" defer></script>
+  <style>
+
+    /* ══ TOKENS ══ */
+    :root {
+      --bg:          #070707;
+      --surface:     #0D0D0D;
+      --surface-2:   #161616;
+      --orange:      #E86C00;
+      --orange-dim:  rgba(232,108,0,0.35);
+      --orange-glow: rgba(232,108,0,0.09);
+      --white:       #F2EDE7;
+      --gray:        #7A7570;
+      --gray-light:  #AAA49E;
+      --border:      rgba(255,255,255,0.07);
+    }
+
+    /* ══ RESET ══ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    /* Nota: scroll-behavior:smooth está desactivado en HTML global porque
+       los anchors nativos calculan la posición UNA sola vez al parsear.
+       Con imágenes lazy la página crece y el destino queda mal.
+       El scroll suave lo maneja el JS directamente con window.scrollTo. */
+    html { scroll-behavior: auto; }
+    body {
+      background: var(--bg);
+      color: var(--white);
+      font-family: 'DM Sans', system-ui, sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    img { display: block; max-width: 100%; }
+    /* Reservar espacio para imágenes lazy antes de que carguen,
+       así la página no "salta" y ScrollTrigger no se desincroniza.
+       Las imágenes con object-fit:cover en contenedores de altura fija
+       no necesitan esto, pero las del flow sí. */
+    img[loading="lazy"] { min-height: 1px; }
+    a { color: inherit; text-decoration: none; }
+
+    /* ══ AMBIENT FX — sun-ray glow + fluor dust, fixed sobre todo el fondo ══ */
+    #ambient-fx {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .ambient-glow {
+      position: absolute;
+      top: -25%;
+      left: 50%;
+      width: 130%;
+      height: 90%;
+      transform: translateX(-50%);
+      background: radial-gradient(ellipse 55% 60% at 50% 0%, rgba(232,108,0,0.16) 0%, rgba(232,108,0,0.06) 35%, transparent 70%);
+      filter: blur(6px);
+    }
+    .ambient-dust {
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(circle 2px, rgba(255,153,51,0.9) 0%, rgba(255,153,51,0) 100%),
+        radial-gradient(circle 1.4px, rgba(255,153,51,0.75) 0%, rgba(255,153,51,0) 100%),
+        radial-gradient(circle 1.8px, rgba(255,153,51,0.8) 0%, rgba(255,153,51,0) 100%),
+        radial-gradient(circle 1.4px, rgba(255,153,51,0.65) 0%, rgba(255,153,51,0) 100%),
+        radial-gradient(circle 2px, rgba(255,153,51,0.85) 0%, rgba(255,153,51,0) 100%),
+        radial-gradient(circle 1.5px, rgba(255,153,51,0.7) 0%, rgba(255,153,51,0) 100%),
+        radial-gradient(circle 1.6px, rgba(255,153,51,0.75) 0%, rgba(255,153,51,0) 100%),
+        radial-gradient(circle 1.3px, rgba(255,153,51,0.6) 0%, rgba(255,153,51,0) 100%);
+      background-repeat: no-repeat;
+      background-size: 3px 3px;
+      background-position:
+        8% 12%, 22% 38%, 38% 8%, 52% 58%,
+        68% 22%, 81% 48%, 91% 14%, 14% 72%;
+      opacity: 0.55;
+      animation: dustTwinkle 7s ease-in-out infinite;
+    }
+    @keyframes dustTwinkle {
+      0%, 100% { opacity: 0.35; }
+      50% { opacity: 0.7; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .ambient-dust { animation: none; }
+    }
+    @media (max-width: 600px) {
+      .ambient-dust { opacity: 0.35; }
+    }
+
+    /* ══ BRAND LOCKUP ══ */
+    .brand-lockup {
+      position: relative;
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      line-height: 1;
+    }
+    .brand-o {
+      font-family: 'Bebas Neue', sans-serif;
+      color: var(--white);
+      display: block;
+      position: relative;
+      z-index: 1;
+      line-height: 1;
+      letter-spacing: 0.1em;
+    }
+    .brand-p {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-weight: 400;
+      color: var(--orange);
+      display: block;
+      position: relative;
+      z-index: 2;
+      margin-top: -0.55em;
+      line-height: 1;
+      letter-spacing: 0.06em;
+      white-space: nowrap;
+    }
+    .brand-lockup--hero .brand-o { font-size: clamp(4rem, 14vw, 7rem); }
+    .brand-lockup--hero .brand-p { font-size: clamp(3.5rem, 12vw, 6.2rem); }
+    .brand-lockup--lg   .brand-o { font-size: clamp(3rem, 8vw, 5.5rem); }
+    .brand-lockup--lg   .brand-p { font-size: clamp(2.6rem, 7vw, 4.9rem); }
+    .brand-lockup--md   .brand-o { font-size: 2.2rem; }
+    .brand-lockup--md   .brand-p { font-size: 2rem; }
+    .brand-lockup--sm   .brand-o { font-size: 1.1rem; }
+    .brand-lockup--sm   .brand-p { font-size: 1rem; margin-top: 0; }
+
+    /* ══ NAV ══ */
+    .site-nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.25rem 2.5rem;
+      background: rgba(7,7,7,0);
+      border-bottom: 1px solid transparent;
+      transition: background 0.5s ease, border-color 0.5s ease;
+    }
+    .site-nav.scrolled {
+      background: rgba(7,7,7,0.92);
+      border-color: var(--border);
+      backdrop-filter: blur(14px);
+    }
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+    .site-nav.scrolled .nav-links {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+    /* El botón Consultar siempre es clickeable, independiente del estado del nav */
+    .nav-cta {
+      pointer-events: auto !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+      /* Reset estilos nativos de <button> */
+      appearance: none;
+      -webkit-appearance: none;
+      border: none;
+      background: none;
+    }
+    .nav-links a {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 400;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gray-light);
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--white); }
+    .nav-cta {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--orange);
+      background: var(--surface-2);
+      border: 1px solid var(--orange-dim);
+      padding: 0.5rem 1.25rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, color 0.2s;
+      cursor: pointer;
+    }
+    .nav-cta:hover {
+      background: var(--orange);
+      color: var(--bg);
+    }
+
+    /* ══ REVEAL SYSTEM ══ */
+    /* When GSAP is loaded, it takes over; CSS fallback stays for non-hero */
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.45s ease var(--delay, 0s),
+                  transform 0.45s ease var(--delay, 0s);
+    }
+    .reveal.is-visible { opacity: 1; transform: none; }
+
+    .reveal-left {
+      opacity: 0;
+      transform: translateX(-30px);
+      transition: opacity 0.45s ease var(--delay, 0s),
+                  transform 0.45s ease var(--delay, 0s);
+    }
+    .reveal-left.is-visible { opacity: 1; transform: none; }
+
+    .reveal-right {
+      opacity: 0;
+      transform: translateX(30px);
+      transition: opacity 0.45s ease var(--delay, 0s),
+                  transform 0.45s ease var(--delay, 0s);
+    }
+    .reveal-right.is-visible { opacity: 1; transform: none; }
+
+    /* ══ LOTTIE — hero ambient particle ══ */
+    #lottie-hero {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      opacity: 0.18;
+      mix-blend-mode: screen;
+    }
+
+    /* ══ HERO GSAP targets — start hidden, GSAP animates them ══ */
+    .gsap-hero-el { opacity: 0; }
+
+    /* ══ SWIPER — Cocktail Carousels ══ */
+    .swiper-cocktail {
+      width: 100%;
+      padding: 0 6vw 3rem !important;
+      overflow: visible !important;
+    }
+    /* Cuando hay dos filas apiladas (Cremosos / Frescos), separarlas bien */
+    .swiper-invierno + .swiper-invierno {
+      margin-top: 1rem;
+    }
+    .swiper-cocktail .swiper-wrapper {
+      align-items: center;
+    }
+    .swiper-cocktail .swiper-slide {
+      width: min(420px, 80vw) !important;
+      height: min(620px, 76vh) !important;
+      flex-shrink: 0;
+    }
+    .swiper-cocktail .swiper-pagination {
+      display: none;
+    }
+    .swiper-cocktail .swiper-pagination-bullet {
+      flex: 1;
+      height: 1px;
+      border-radius: 0;
+      background: var(--border);
+      opacity: 1;
+      margin: 0 !important;
+      transition: background 0.4s;
+    }
+    .swiper-cocktail .swiper-pagination-bullet-active {
+      background: var(--orange);
+    }
+    .swiper-cocktail .swiper-button-next,
+    .swiper-cocktail .swiper-button-prev {
+      color: var(--white);
+      width: 2.8rem;
+      height: 2.8rem;
+      background: rgba(7,7,7,0.55);
+      border: 1px solid rgba(255,255,255,0.14);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      top: 1.4rem;
+      bottom: auto;
+      transition: background 0.2s, color 0.2s, border-color 0.2s;
+    }
+    .swiper-cocktail .swiper-button-next { right: 6vw; }
+    .swiper-cocktail .swiper-button-prev { right: calc(6vw + 3.2rem); left: auto; }
+    .swiper-cocktail .swiper-button-next::after,
+    .swiper-cocktail .swiper-button-prev::after {
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+    .swiper-cocktail .swiper-button-next:hover,
+    .swiper-cocktail .swiper-button-prev:hover {
+      background: var(--orange);
+      color: var(--bg);
+      border-color: var(--orange);
+    }
+    .swiper-cocktail .swiper-slide:not(.swiper-slide-active) .cocktail-panel {
+      transform: scale(0.93);
+      transition: transform 0.55s ease;
+    }
+    .swiper-cocktail .swiper-slide-active .cocktail-panel {
+      box-shadow: 0 0 50px rgba(232,108,0,0.22), 0 0 0 1px var(--orange-dim);
+      transform: scale(1);
+      transition: transform 0.55s ease;
+    }
+    /* ══ CATEGORÍA — separador de puro texto (no es card) ══
+       Eyebrow + título + línea + subtítulo, y las flechas del carrusel
+       a la derecha del texto: todo el grupo queda centrado como una unidad. */
+    .cat-banner {
+      width: calc(100% - 5rem);
+      max-width: 1200px;
+      margin: 0 auto 1.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 1.4rem;
+      padding: 0.5rem 2rem;
+    }
+    .cat-banner-text {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.4rem 0.9rem;
+      text-align: center;
+    }
+    .cat-banner-eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.6rem;
+      font-weight: 400;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: var(--orange);
+    }
+    .cat-banner-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-weight: 400;
+      font-size: clamp(1.4rem, 3vw, 1.9rem);
+      line-height: 1;
+      color: var(--white);
+    }
+    .cat-banner-sub {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 0.92rem;
+      color: var(--gray-light);
+      padding-left: 0.9rem;
+      border-left: 1px solid var(--border);
+    }
+    /* Flechas del carrusel, ahora junto al texto en vez de flotando
+       sobre las imágenes: más visibles, más sólidas, sin blur. */
+    .cat-banner-nav {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      flex-shrink: 0;
+    }
+    .cat-banner-nav .swiper-button-prev,
+    .cat-banner-nav .swiper-button-next {
+      position: static !important;
+      margin: 0 !important;
+      top: auto !important;
+      left: auto !important;
+      right: auto !important;
+      width: 2.5rem;
+      height: 2.5rem;
+      color: var(--orange);
+      background: var(--surface-2);
+      border: 1px solid var(--orange-dim);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      transition: background 0.2s, color 0.2s, border-color 0.2s;
+    }
+    .cat-banner-nav .swiper-button-prev::after,
+    .cat-banner-nav .swiper-button-next::after {
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+    .cat-banner-nav .swiper-button-prev:hover,
+    .cat-banner-nav .swiper-button-next:hover {
+      background: var(--orange);
+      color: var(--bg);
+      border-color: var(--orange);
+    }
+    .cat-banner-nav .swiper-button-disabled {
+      opacity: 0.3;
+    }
+
+
+
+    /* ══ SEASON TOGGLE — color theming ══ */
+    :root {
+      --season-accent:   var(--orange);
+      --season-accent-d: var(--orange-dim);
+    }
+    body.is-invierno {
+      --season-accent:   #7CB8D4;
+      --season-accent-d: rgba(124,184,212,0.35);
+    }
+    .s-season--invierno .eyebrow,
+    .s-season--invierno .cp-base {
+      transition: color 0.8s ease;
+    }
+
+    /* ══ NAV CTA — Lottie micro-icon ══ */
+    .nav-cta-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+    }
+    .nav-cta-wrap::after {
+      content: '';
+      display: block;
+      width: 18px;
+      height: 1px;
+      flex-shrink: 0;
+    }
+    #lottie-cta {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+
+    /* ══ UTILITIES ══ */
+    .eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      font-weight: 400;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--orange);
+      margin-bottom: 1.25rem;
+      display: block;
+    }
+    .eyebrow-light {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      font-weight: 400;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gray);
+      margin-bottom: 1.25rem;
+      display: block;
+    }
+
+    /* ══════════════════════════════════════
+       SECTION 1 — HERO
+    ══════════════════════════════════════ */
+    .s-hero {
+      position: relative;
+      height: 100vh;
+      min-height: 640px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      isolation: isolate;
+    }
+    /* Background photo, graded into the near-black brand world */
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      background-image: url('orangepepperphoto.png'); /* fallback universal: navegadores sin image-set o sin WebP (Safari ≤13) */
+      background-image: image-set(url('orangepepperphoto.webp') type('image/webp'), url('orangepepperphoto.png') type('image/png'));
+      background-size: cover;
+      background-position: center 38%;
+      filter: brightness(0.6) saturate(1.18) contrast(1.06);
+      transform: scale(1.06);
+      will-change: transform;
+    }
+    .hero-bg.loaded { }
+    /* Warm spotlight behind the plate + edge vignette: makes the
+       cocktails glow and darkens the light-grey surround so the hero
+       belongs to the dark site instead of fighting it. */
+    .hero-grade {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse 58% 50% at 50% 44%, rgba(232,108,0,0.20) 0%, rgba(232,108,0,0.05) 38%, transparent 66%),
+        radial-gradient(ellipse 95% 82% at 50% 42%, transparent 36%, rgba(5,3,1,0.55) 78%, rgba(5,3,1,0.85) 100%);
+    }
+    .hero-vignette {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      background:
+        linear-gradient(to bottom,
+          rgba(7,7,7,0.80) 0%,
+          rgba(7,7,7,0.14) 15%,
+          rgba(7,7,7,0) 33%,
+          rgba(7,7,7,0) 52%,
+          rgba(7,7,7,0.55) 82%,
+          var(--bg) 100%
+        );
+    }
+    /* Centered identity column */
+    .hero-content {
+      position: relative;
+      z-index: 3;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 1.4rem;
+      padding: 0 1.5rem;
+      margin-top: -2.5vh;
+    }
+    .hero-eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: clamp(0.58rem, 1.2vw, 0.72rem);
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      color: var(--orange);
+      display: flex;
+      align-items: center;
+      gap: 0.95em;
+      white-space: nowrap;
+    }
+    .hero-eyebrow::before,
+    .hero-eyebrow::after {
+      content: '';
+      width: clamp(18px, 4vw, 30px);
+      height: 1px;
+      background: var(--orange-dim);
+    }
+    /* Legibility scrim that travels with the wordmark */
+    .hero-lockup {
+      position: relative;
+      padding: 0.3rem 0;
+    }
+    .hero-lockup::before {
+      content: '';
+      position: absolute;
+      left: 50%; top: 50%;
+      width: 155%; height: 180%;
+      transform: translate(-50%, -50%);
+      background: radial-gradient(ellipse 50% 50% at 50% 50%, rgba(3,2,1,0.55) 0%, transparent 70%);
+      z-index: -1;
+      pointer-events: none;
+    }
+    .brand-lockup--hero .brand-o { text-shadow: 0 2px 30px rgba(0,0,0,0.55); }
+    .brand-lockup--hero .brand-p { text-shadow: 0 0 34px rgba(232,108,0,0.45), 0 2px 10px rgba(0,0,0,0.5); }
+    .hero-rule {
+      width: 64px;
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--orange), transparent);
+      transform-origin: center;
+    }
+    .hero-tagline {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.3rem, 3vw, 1.95rem);
+      font-weight: 400;
+      font-style: italic;
+      color: rgba(242,237,231,0.95);
+      letter-spacing: 0.06em;
+      text-shadow: 0 2px 20px rgba(0,0,0,0.6), 0 1px 3px rgba(0,0,0,0.6);
+    }
+    .hero-tagline em { color: var(--orange); font-style: italic; }
+    /* Bottom band: season tag · scroll cue · place */
+    .hero-foot {
+      position: absolute;
+      left: 0; right: 0; bottom: 2rem;
+      z-index: 3;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      padding: 0 clamp(1.5rem, 4vw, 3rem);
+      gap: 1rem;
+    }
+    .hero-season {
+      justify-self: start;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.65em;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gray-light);
+      border: 1px solid var(--border);
+      padding: 0.5rem 0.9rem;
+      background: rgba(7,7,7,0.35);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+    .hero-season .dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--season-accent);
+      box-shadow: 0 0 10px var(--season-accent);
+    }
+    .hero-place {
+      justify-self: end;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: rgba(242,237,231,0.55);
+    }
+    .hero-scroll {
+      justify-self: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .hero-scroll span {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.55rem;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: var(--gray);
+    }
+    .hero-scroll-arrow {
+      width: 18px;
+      height: 40px;
+      position: relative;
+      animation: scrollBreathe 2s 2.5s ease-in-out infinite;
+    }
+    .hero-scroll-arrow::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 0;
+      transform: translateX(-50%);
+      width: 1px;
+      height: 34px;
+      background: linear-gradient(to bottom, var(--orange), transparent);
+    }
+    .hero-scroll-arrow::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      bottom: 0;
+      transform: translateX(-50%) rotate(45deg);
+      width: 7px;
+      height: 7px;
+      border-right: 1px solid var(--orange);
+      border-bottom: 1px solid var(--orange);
+      opacity: 0.7;
+    }
+    @keyframes heroScrollIn { to { opacity: 1; } }
+    @keyframes scrollBreathe {
+      0%, 100% { opacity: 0.35; transform: scaleY(0.9); }
+      50%       { opacity: 1;    transform: scaleY(1);   }
+    }
+
+    /* ══════════════════════════════════════
+       SECTION 2 — MANIFIESTO
+    ══════════════════════════════════════ */
+    .s-manifesto {
+      position: relative;
+      padding: 11rem 2.5rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      overflow: hidden;
+    }
+    .manifesto-ghost {
+      position: absolute;
+      right: -2rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(9rem, 20vw, 16rem);
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(232,108,0,0.06);
+      letter-spacing: 0.04em;
+      line-height: 1;
+      pointer-events: none;
+      user-select: none;
+    }
+    .manifesto-headline {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(3rem, 7vw, 6rem);
+      font-weight: 300;
+      font-style: italic;
+      line-height: 1.05;
+      color: var(--white);
+      max-width: 780px;
+      margin-bottom: 3rem;
+      letter-spacing: -0.01em;
+    }
+    .manifesto-headline strong {
+      font-weight: 500;
+      color: var(--orange);
+      font-style: normal;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.08em;
+      letter-spacing: 0.06em;
+    }
+    .manifesto-tenets {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+      max-width: 960px;
+      margin-bottom: 4rem;
+      padding-top: 3rem;
+      border-top: 1px solid var(--border);
+    }
+    .tenet {
+      position: relative;
+      padding: 2rem 2.5rem 2rem 0;
+      border-right: 1px solid var(--border);
+    }
+    .tenet:last-child {
+      border-right: none;
+      padding-right: 0;
+      padding-left: 2.5rem;
+    }
+    .tenet:nth-child(2) {
+      padding-left: 2.5rem;
+    }
+    .tenet-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 3.5rem;
+      letter-spacing: 0.04em;
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(232,108,0,0.3);
+      display: block;
+      line-height: 1;
+      margin-bottom: 1rem;
+    }
+    .tenet-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.3rem, 2.2vw, 1.75rem);
+      font-weight: 300;
+      font-style: italic;
+      line-height: 1.2;
+      color: var(--white);
+    }
+    .manifesto-lead {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.25rem, 2.3vw, 1.75rem);
+      font-weight: 300;
+      font-style: italic;
+      line-height: 1.55;
+      color: var(--gray-light);
+      max-width: 760px;
+    }
+    .manifesto-lead em {
+      color: var(--orange);
+      font-style: italic;
+    }
+
+    /* ══════════════════════════════════════
+       SECTION 3 — LA BARRA
+    ══════════════════════════════════════ */
+    .s-barra {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 80vh;
+    }
+    .barra-image {
+      position: relative;
+      overflow: hidden;
+    }
+    .barra-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      filter: brightness(0.72) saturate(0.85);
+      transition: transform 6s ease, filter 0.5s ease;
+    }
+    .barra-image:hover img {
+      transform: scale(1.04);
+      filter: brightness(0.85) saturate(1);
+    }
+    .barra-image-fade {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to right, transparent 60%, var(--surface) 100%);
+    }
+    .barra-copy {
+      padding: 7rem 4rem 7rem 5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background: var(--surface);
+    }
+    .barra-copy h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.5rem, 5vw, 4.2rem);
+      font-weight: 300;
+      font-style: italic;
+      line-height: 1.1;
+      color: var(--white);
+      margin-bottom: 1.4rem;
+      letter-spacing: -0.01em;
+    }
+    .barra-copy h2 em { color: var(--orange); }
+    .barra-lead {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-weight: 300;
+      font-size: 1.2rem;
+      line-height: 1.5;
+      color: var(--gray-light);
+      margin-bottom: 2.4rem;
+      max-width: 420px;
+    }
+    .barra-lead em { color: var(--orange); font-style: italic; }
+    .barra-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.95rem;
+    }
+    .barra-list li {
+      font-size: 0.9rem;
+      color: var(--gray-light);
+      padding-left: 1.5rem;
+      position: relative;
+      font-weight: 300;
+    }
+    .barra-list li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0.58em;
+      width: 8px;
+      height: 1px;
+      background: var(--orange);
+    }
+
+    /* ══════════════════════════════════════
+       SECTION 4 — EVENT CYCLES
+    ══════════════════════════════════════ */
+    .s-cycles {
+      padding: 10rem 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      position: relative;
+    }
+    .s-cycles::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at center, var(--orange-glow) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    .cycles-inner { max-width: 580px; position: relative; z-index: 1; }
+    .cycles-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(3rem, 7.5vw, 6.2rem);
+      font-weight: 300;
+      font-style: italic;
+      line-height: 1.05;
+      color: var(--white);
+      margin-bottom: 2rem;
+      letter-spacing: -0.01em;
+    }
+    .cycles-title em { color: var(--orange); }
+    .cycles-body {
+      font-size: 0.95rem;
+      font-weight: 300;
+      color: var(--gray-light);
+      line-height: 1.85;
+    }
+
+    /* ══════════════════════════════════════
+       SEASONS — SHARED
+    ══════════════════════════════════════ */
+    .s-season {
+      position: relative;
+      padding: 7rem 0 0;
+    }
+    .season-bg-word {
+      position: absolute;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(12rem, 32vw, 24rem);
+      line-height: 0.85;
+      letter-spacing: 0.03em;
+      pointer-events: none;
+      user-select: none;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      white-space: nowrap;
+      z-index: 0;
+    }
+    .season-header {
+      padding: 0 2.5rem;
+      max-width: 1200px;
+      margin: 0 auto 3.5rem;
+      position: relative;
+      z-index: 1;
+    }
+    .season-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.6rem, 6vw, 5rem);
+      font-weight: 300;
+      font-style: italic;
+      line-height: 1.1;
+      color: var(--white);
+      margin-bottom: 0.85rem;
+      letter-spacing: -0.01em;
+    }
+    .season-title em { color: var(--orange); }
+    .season-header-label {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      margin-bottom: 0.6rem;
+    }
+    .season-desc {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.05rem, 2vw, 1.3rem);
+      font-style: italic;
+      font-weight: 400;
+      color: var(--gray-light);
+      line-height: 1.6;
+      max-width: 52ch;
+      position: relative;
+      padding-left: 1.25rem;
+      border-left: 1px solid var(--orange-dim);
+    }
+    .season-desc strong {
+      font-style: normal;
+      font-weight: 500;
+      color: var(--white);
+    }
+
+    /* ══════════════════════════════════════
+       SECTION 5 — CARTA VERANO
+    ══════════════════════════════════════ */
+    .s-season--verano .season-bg-word {
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(232,108,0,0.055);
+    }
+
+    /* ══════════════════════════════════════
+       COCKTAIL SHOWCASE — pinned horizontal pan
+    ══════════════════════════════════════ */
+    .hpan {
+      position: relative;
+      /* height set by JS on desktop = 100vh + horizontal travel */
+    }
+    .hpan-sticky {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+    }
+    .hpan-track {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      padding: 0 6vw;
+      will-change: transform;
+      position: relative;
+      z-index: 1;
+    }
+    .hpan-progress {
+      position: absolute;
+      left: 6vw;
+      right: 6vw;
+      bottom: 2.4rem;
+      height: 1px;
+      background: var(--border);
+      z-index: 3;
+    }
+    .hpan-progress-bar {
+      display: block;
+      height: 100%;
+      width: 100%;
+      background: var(--orange);
+      transform-origin: left center;
+      transform: scaleX(0);
+    }
+    .hpan-hint {
+      position: absolute;
+      right: 6vw;
+      bottom: 3rem;
+      z-index: 3;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.58rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gray);
+      transition: opacity 0.4s ease;
+    }
+
+    /* cocktail panel — image dominant, text over scrim */
+    .cocktail-panel {
+      position: relative;
+      flex: 0 0 auto;
+      width: min(420px, 80vw);
+      height: min(620px, 76vh);
+      overflow: hidden;
+      background: var(--surface);
+    }
+    .cocktail-panel img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      filter: brightness(1) saturate(1.15);
+      transition: transform 1.3s cubic-bezier(0.22,0.61,0.36,1);
+    }
+    .cocktail-panel:hover img {
+      transform: scale(1.06);
+    }
+    .cocktail-panel::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top,
+        rgba(3,3,3,0.95) 0%,
+        rgba(3,3,3,0.6) 30%,
+        rgba(3,3,3,0.05) 58%,
+        transparent 75%);
+    }
+    .cp-info {
+      position: absolute;
+      left: 0; right: 0; bottom: 0;
+      z-index: 2;
+      padding: 2rem 1.8rem;
+    }
+    .cp-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-weight: 400;
+      font-size: 2.2rem;
+      line-height: 1;
+      color: var(--white);
+      margin-bottom: 0.85rem;
+    }
+    .cp-base {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.58rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--orange);
+      margin-bottom: 0.75rem;
+    }
+    .cp-ing {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+    .cp-ing li {
+      font-size: 0.82rem;
+      font-weight: 300;
+      color: var(--gray-light);
+      line-height: 1.4;
+    }
+
+    /* ══════════════════════════════════════
+       SECTION 6 — SEASON TRANSITION
+    ══════════════════════════════════════ */
+    .s-transition {
+      position: relative;
+      height: 90vh;
+    }
+    .transition-sticky {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      background: var(--bg);
+    }
+    .transition-word {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(7rem, 22vw, 16rem);
+      letter-spacing: 0.08em;
+      color: var(--white);
+      line-height: 1;
+      opacity: 0;
+      transform: scale(0.72);
+      position: relative;
+      z-index: 1;
+    }
+    .transition-sub {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: clamp(1rem, 2.5vw, 1.4rem);
+      font-weight: 300;
+      color: var(--gray);
+      margin-top: 1.5rem;
+      opacity: 0;
+      letter-spacing: 0.06em;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ── Mini variante: transición de VERANO (más corta que la de invierno) ── */
+    .s-transition--mini {
+      height: 55vh;
+    }
+    .s-transition--mini .transition-sticky {
+      justify-content: flex-start;
+      padding-top: 12vh;
+    }
+    .s-transition--mini .transition-word {
+      font-size: clamp(7rem, 22vw, 18rem);
+      color: transparent;
+      -webkit-text-stroke: 1.5px rgba(232,108,0,0.55);
+    }
+
+    /* ══════════════════════════════════════
+       SECTION 7 — CARTA INVIERNO
+    ══════════════════════════════════════ */
+    .s-season--invierno {
+      background: var(--surface);
+      padding-bottom: 6rem;
+    }
+    .s-season--invierno .season-bg-word {
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(242,237,231,0.025);
+    }
+    .invierno-sub {
+      margin-bottom: 4rem;
+    }
+    .invierno-sub-header {
+      padding: 0 2.5rem;
+      max-width: 1200px;
+      margin: 0 auto 2rem;
+      display: flex;
+      align-items: baseline;
+      gap: 1.5rem;
+      position: relative;
+      z-index: 1;
+    }
+    .invierno-sub-header h3 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2rem;
+      letter-spacing: 0.1em;
+      color: var(--white);
+    }
+    .invierno-sub-header p {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 1rem;
+      color: var(--gray);
+    }
+
+    /* ══════════════════════════════════════
+       SECTION 9 — EL SERVICIO
+    ══════════════════════════════════════ */
+    .s-service {
+      padding: 8rem 2.5rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .service-intro {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5rem;
+      align-items: end;
+      margin-bottom: 5rem;
+    }
+    .service-headline {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.8rem, 6vw, 5.2rem);
+      font-weight: 300;
+      font-style: italic;
+      line-height: 1.05;
+      color: var(--white);
+      letter-spacing: -0.01em;
+    }
+    .service-headline em { color: var(--orange); }
+    .service-includes {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+    .service-includes li {
+      font-size: 0.88rem;
+      color: var(--gray-light);
+      font-weight: 300;
+      padding-left: 1.5rem;
+      position: relative;
+    }
+    .service-includes li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0.6em;
+      width: 8px;
+      height: 1px;
+      background: var(--orange);
+    }
+    /* ══════════════════════════════════════
+       SECTION — CATEGORÍAS (escalera de niveles)
+    ══════════════════════════════════════ */
+    .s-categories {
+      padding: 9rem 2.5rem;
+      background: #050505;
+      position: relative;
+      overflow: hidden;
+    }
+    .s-categories::before { display: none; }
+    .cat-head {
+      max-width: 1200px;
+      margin: 0 auto 4rem;
+      position: relative;
+      z-index: 1;
+    }
+    .cat-head h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.8rem, 6vw, 5.2rem);
+      font-weight: 300;
+      font-style: italic;
+      line-height: 1.05;
+      color: var(--white);
+      margin-bottom: 1rem;
+      letter-spacing: -0.01em;
+    }
+    .cat-head h2 em { color: var(--orange); font-style: italic; }
+    .cat-head p {
+      font-size: 0.92rem;
+      font-weight: 300;
+      color: var(--gray-light);
+      line-height: 1.8;
+      max-width: 540px;
+    }
+
+    .price-grid {
+      max-width: 1200px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.25rem;
+      align-items: stretch;
+    }
+    .price-card {
+      display: flex;
+      flex-direction: column;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 2.25rem 1.75rem 2rem;
+      position: relative;
+      transition: border-color 0.35s ease, transform 0.4s ease;
+    }
+    .price-card:hover {
+      border-color: var(--orange-dim);
+      transform: translateY(-5px);
+    }
+    .price-people {
+      display: flex;
+      align-items: baseline;
+      gap: 0.4rem;
+      margin-bottom: 0.2rem;
+    }
+    .price-people .num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 4.2rem;
+      line-height: 0.85;
+      letter-spacing: 0.02em;
+      color: var(--white);
+    }
+    .price-people .lbl {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--gray);
+    }
+    .price-cat {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--orange);
+      margin-bottom: 1.6rem;
+      padding-bottom: 1.4rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .price-includes {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      margin-bottom: 1.8rem;
+      flex-grow: 1;
+    }
+    .price-includes li {
+      font-size: 0.82rem;
+      font-weight: 300;
+      color: var(--gray-light);
+      line-height: 1.4;
+      padding-left: 1.25rem;
+      position: relative;
+    }
+    .price-includes li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0.5em;
+      width: 7px;
+      height: 1px;
+      background: var(--orange);
+    }
+    .price-includes li.is-extra {
+      color: var(--white);
+    }
+    .price-amount-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.56rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gray);
+      margin-bottom: 0.25rem;
+    }
+    .price-amount {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.5rem;
+      letter-spacing: 0.02em;
+      line-height: 1;
+      color: var(--white);
+      margin-bottom: 1rem;
+    }
+    .price-upgrade {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 0.5rem;
+      padding-top: 0.85rem;
+      border-top: 1px solid var(--border);
+    }
+    .price-upgrade .u-name {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gray-light);
+    }
+    .price-upgrade .u-amount {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 1.05rem;
+      color: var(--white);
+    }
+    .price-solo {
+      font-size: 0.72rem;
+      font-weight: 300;
+      color: var(--gray);
+      margin-top: 0.85rem;
+      line-height: 1.45;
+    }
+    .price-solo strong { color: var(--gray-light); font-weight: 400; }
+
+    /* Featured — paquete 100 / Gold */
+    .price-card--featured {
+      background: linear-gradient(to bottom, rgba(232,108,0,0.06), var(--surface) 40%);
+      border-color: var(--orange-dim);
+    }
+    .price-card--featured .price-amount,
+    .price-card--featured .price-upgrade .u-amount { color: var(--orange); }
+    .price-flag {
+      position: absolute;
+      top: 0;
+      right: 1.75rem;
+      transform: translateY(-50%);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.55rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--bg);
+      background: var(--orange);
+      padding: 0.25rem 0.7rem;
+    }
+
+    .price-note {
+      max-width: 1200px;
+      margin: 2.5rem auto 0;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--gray);
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ══════════════════════════════════════
+       SECTION 10 — ECOSISTEMA
+    ══════════════════════════════════════ */
+    .s-eco {
+      padding: 7rem 2.5rem;
+      background: var(--surface);
+      text-align: center;
+    }
+    .eco-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.8rem, 6.5vw, 5.5rem);
+      font-weight: 300;
+      font-style: italic;
+      color: var(--white);
+      margin-bottom: 0.85rem;
+      line-height: 1.05;
+      letter-spacing: -0.01em;
+    }
+    .eco-title em { color: var(--orange); }
+    .eco-sub {
+      font-size: 0.88rem;
+      color: var(--gray);
+      font-weight: 300;
+      margin-bottom: 4rem;
+    }
+    .eco-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2.5rem;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    .eco-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+    .eco-icon {
+      width: 54px;
+      height: 54px;
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--orange);
+      font-size: 1.3rem;
+      transition: border-color 0.3s, background 0.3s;
+    }
+    .eco-item:hover .eco-icon {
+      border-color: var(--orange-dim);
+      background: rgba(232,108,0,0.04);
+    }
+    .eco-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.05rem;
+      letter-spacing: 0.1em;
+      color: var(--white);
+    }
+    .eco-desc {
+      font-size: 0.78rem;
+      color: var(--gray);
+      font-weight: 300;
+      line-height: 1.6;
+    }
+
+    /* ══════════════════════════════════════
+       SECTION 11 — GALERÍA
+    ══════════════════════════════════════ */
+    .s-gallery { padding: 6rem 0; }
+    .gallery-header {
+      padding: 0 2.5rem;
+      max-width: 1200px;
+      margin: 0 auto 2.5rem;
+    }
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: auto;
+      gap: 2px;
+    }
+    .gallery-item {
+      overflow: hidden;
+      background: var(--surface);
+      aspect-ratio: 4/3;
+    }
+    .gallery-item--tall {
+      grid-row: span 2;
+      aspect-ratio: auto;
+    }
+    .gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: brightness(0.75) saturate(0.65);
+      transition: filter 0.55s ease, transform 0.65s ease;
+    }
+    .gallery-item:hover img {
+      filter: brightness(0.95) saturate(1);
+      transform: scale(1.04);
+    }
+
+    /* ══════════════════════════════════════
+       SECTION 12 — CONTACTO
+    ══════════════════════════════════════ */
+    .s-contact {
+      padding: 10rem 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .s-contact::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at center, rgba(232,108,0,0.055) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    .contact-inner {
+      position: relative;
+      z-index: 1;
+      max-width: 700px;
+    }
+    .contact-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(3.2rem, 7.5vw, 6.5rem);
+      font-weight: 300;
+      font-style: italic;
+      line-height: 1.02;
+      color: var(--white);
+      margin-bottom: 1.5rem;
+      letter-spacing: -0.02em;
+    }
+    .contact-title em { color: var(--orange); }
+    .contact-body {
+      font-size: 0.94rem;
+      color: var(--gray-light);
+      font-weight: 300;
+      margin-bottom: 3rem;
+      line-height: 1.8;
+    }
+    .contact-email {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      letter-spacing: 0.06em;
+      color: var(--white);
+      border-bottom: 1px solid var(--orange-dim);
+      padding-bottom: 0.3rem;
+      transition: color 0.25s, border-color 0.25s;
+    }
+    .contact-email:hover {
+      color: var(--orange);
+      border-color: var(--orange);
+    }
+    .contact-note {
+      margin-top: 2rem;
+      font-size: 0.75rem;
+      color: var(--gray);
+      font-weight: 300;
+      letter-spacing: 0.08em;
+    }
+
+    /* ══════════════════════════════════════
+       FOOTER
+    ══════════════════════════════════════ */
+    .site-footer {
+      position: relative;
+      border-top: 1px solid var(--orange-dim);
+      padding: 2.75rem 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      overflow: hidden;
+    }
+    .site-footer::before {
+      content: '';
+      position: absolute;
+      top: -1px;
+      left: 50%;
+      width: 64%;
+      height: 1px;
+      transform: translateX(-50%);
+      background: linear-gradient(90deg, transparent, var(--orange) 50%, transparent);
+      opacity: 0.7;
+    }
+    .footer-links {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      gap: 1.75rem;
+      list-style: none;
+    }
+    .site-footer > a { position: relative; z-index: 1; }
+    .footer-links a {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--orange);
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--white); }
+    .footer-copy {
+      position: relative;
+      z-index: 1;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--gray-light);
+    }
+    
+    /* ══════════════════════════════════════
+       RESPONSIVE
+    ══════════════════════════════════════ */
+    @media (max-width: 960px) {
+      .s-barra { grid-template-columns: 1fr; }
+      .barra-image { height: 55vw; }
+      .barra-copy { padding: 4rem 2rem; }
+      .manifesto-tenets { grid-template-columns: 1fr; gap: 0; }
+      .tenet { border-right: none; border-bottom: 1px solid var(--border); padding: 1.8rem 0; }
+      .tenet:last-child { border-bottom: none; }
+      .tenet:nth-child(2) { padding-left: 0; }
+      .tenet:last-child { padding-left: 0; }
+      .manifesto-ghost { display: none; }
+      .service-intro { grid-template-columns: 1fr; gap: 3rem; }
+      .eco-grid { grid-template-columns: repeat(2, 1fr); }
+      .price-grid { grid-template-columns: repeat(2, 1fr); }
+      .price-flag { right: 1.25rem; }
+      .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+      .gallery-item--tall { grid-row: auto; aspect-ratio: 4/3; }
+      .nav-links { display: none; }
+      .season-bg-word { display: none; }
+
+      /* Swiper mobile */
+      .swiper-cocktail {
+        padding: 0 1.25rem 3rem !important;
+      }
+      .swiper-cocktail .swiper-slide {
+        height: 70vh !important;
+      }
+      .swiper-cocktail .swiper-button-next { right: 1.25rem; top: 1.2rem; }
+      .swiper-cocktail .swiper-button-prev { right: calc(1.25rem + 3.2rem); left: auto; top: 1.2rem; }
+      .cat-banner { width: calc(100% - 2.5rem); }
+    }
+
+    @media (max-width: 600px) {
+      .s-manifesto { padding: 8rem 1.5rem; }
+      .s-categories { padding: 6rem 1.5rem; }
+      .price-grid { grid-template-columns: 1fr; }
+      .eco-grid { grid-template-columns: 1fr 1fr; }
+      .site-footer { flex-direction: column; text-align: center; align-items: center; }
+      .gallery-grid { grid-template-columns: 1fr; }
+      .barra-copy { padding: 3rem 1.5rem; }
+      .s-service { padding: 6rem 1.5rem; }
+      .s-contact { padding: 7rem 1.5rem; }
+      /* Hero: pie en una sola columna centrada */
+      .hero-foot {
+        grid-template-columns: 1fr;
+        justify-items: center;
+        gap: 0.85rem;
+        bottom: 1.4rem;
+      }
+      .hero-season { justify-self: center; order: 2; }
+      .hero-scroll { order: 1; }
+      .hero-place { display: none; }
+      .hero-content { margin-top: -1vh; }
+      .swiper-cocktail .swiper-slide {
+        height: 65vmax !important;
+        max-height: 75vh !important;
+      }
+      .cat-banner { gap: 0.25rem 0.7rem; padding: 0.3rem 1.25rem; margin-bottom: 1.3rem; }
+      .cat-banner-sub { padding-left: 0.7rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .reveal, .reveal-left, .reveal-right { transition: none; }
+      .gsap-hero-el { opacity: 1 !important; }
+      #lottie-hero { display: none; }
+      .hero-bg { transition: none; transform: none; }
+    }
+
+    /* ════════════════════════════════════════════════
+       REDISEÑO — SISTEMA BOTÁNICO · FILOSOFÍA · PRECIOS
+    ════════════════════════════════════════════════ */
+
+    /* ── Materia flotante (identidad recurrente) ── */
+    .botanic {
+      position: absolute;
+      pointer-events: none;
+      user-select: none;
+      z-index: 0;
+      color: var(--orange);
+      will-change: transform;
+    }
+    .botanic svg { display: block; width: 100%; height: 100%; }
+    @keyframes floatDrift {
+      0%, 100% { transform: translate3d(0,0,0) rotate(var(--rot, 0deg)); }
+      50%       { transform: translate3d(0,-26px,0) rotate(calc(var(--rot, 0deg) + 5deg)); }
+    }
+    @keyframes spinSlow { to { transform: rotate(360deg); } }
+
+    /* ════════════════════════════════════════
+       FILOSOFÍA — triptico cinematográfico
+    ════════════════════════════════════════ */
+    .s-philosophy {
+      position: relative;
+      padding: 5.5rem 2.5rem 12rem;
+      overflow: hidden;
+      background:
+        radial-gradient(ellipse 90% 55% at 50% -8%, rgba(232,108,0,0.055), transparent 60%),
+        var(--bg);
+    }
+    .phil-intro {
+      max-width: 1180px;
+      margin: 0 auto 5.5rem;
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      display: flex;
+      justify-content: center;
+    }
+    .phil-headline {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.1rem, 5vw, 4rem);
+      font-weight: 300;
+      font-style: italic;
+      line-height: 1.18;
+      letter-spacing: -0.01em;
+      color: var(--white);
+      max-width: 760px;
+      margin: 0 auto;
+    }
+    .phil-headline em {
+      font-style: normal;
+      font-family: 'Bebas Neue', sans-serif;
+      color: var(--orange);
+      font-size: 1.05em;
+      letter-spacing: 0.04em;
+    }
+    .phil-movements {
+      max-width: 1180px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 9rem;
+      position: relative;
+      z-index: 2;
+    }
+    .phil-mov {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      gap: 4.5rem;
+      position: relative;
+    }
+    .phil-mov:nth-child(even) .phil-mov-visual { order: 2; }
+
+    /* orbe orgánico que enmarca la materia */
+    .phil-orb {
+      position: relative;
+      aspect-ratio: 1;
+      width: min(100%, 440px);
+      margin: 0 auto;
+      border-radius: 47% 53% 44% 56% / 52% 46% 54% 48%;
+      overflow: hidden;
+      isolation: isolate;
+      box-shadow: 0 50px 130px -45px rgba(232,108,0,0.45), inset 0 0 0 1px var(--border);
+      animation: floatDrift 12s ease-in-out infinite;
+    }
+    .phil-mov:nth-child(even) .phil-orb { animation-duration: 14s; animation-delay: -3s; }
+    .phil-orb img,
+    .phil-orb video {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      filter: brightness(0.8) saturate(1.05);
+      transform: scale(1.06);
+      transition: transform 1.4s cubic-bezier(.22,.61,.36,1), filter .6s ease;
+    }
+    .phil-mov:hover .phil-orb img,
+    .phil-mov:hover .phil-orb video { transform: scale(1.13); filter: brightness(0.95) saturate(1.18); }
+    .phil-orb::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(circle at 32% 24%, transparent 38%, rgba(7,7,7,0.55));
+      mix-blend-mode: multiply;
+    }
+    .phil-mov-text { position: relative; z-index: 0; }
+    .phil-kicker {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.64rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--orange);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.9rem;
+      margin-bottom: 1.4rem;
+    }
+    .phil-kicker::before {
+      content: '';
+      width: 36px;
+      height: 1px;
+      background: var(--orange);
+      flex-shrink: 0;
+    }
+    .phil-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-weight: 300;
+      font-size: clamp(2.2rem, 4.5vw, 3.6rem);
+      line-height: 1.05;
+      color: var(--white);
+      margin-bottom: 1.4rem;
+    }
+    .phil-body {
+      font-size: 1rem;
+      font-weight: 300;
+      line-height: 1.85;
+      color: var(--gray-light);
+      max-width: 460px;
+    }
+    .phil-body em { color: var(--white); font-style: italic; }
+    /* ── Ingredientes reales flotando por el scroll ── */
+    .float-ingredient {
+      position: absolute;
+      aspect-ratio: 1;
+      pointer-events: none;
+      user-select: none;
+      z-index: 0;
+      will-change: transform;
+      filter: drop-shadow(0 24px 46px rgba(0,0,0,0.55));
+    }
+    .float-ingredient img { width: 100%; height: 100%; object-fit: contain; display: block; }
+    .botanic img { width: 100%; height: 100%; object-fit: contain; display: block; }
+
+    .fi-orange-phil { top: 100%; margin-top: -0.6rem; left: 56%; width: clamp(110px, 12vw, 190px); opacity: 0.85; z-index: 1; }
+    .fi-mint-phil    { top: 50%; left: 50%; margin: 0; transform: translate(-50%, -50%); width: clamp(160px, 18vw, 260px); opacity: 0.22; z-index: -1; filter: drop-shadow(0 24px 46px rgba(0,0,0,0.55)) saturate(0.7); }
+    .fi-slice-trans-big { top: 4%; left: 22%; width: clamp(240px, 30vw, 460px); opacity: 0.4; z-index: 0; }
+    .fi-slice-trans { top: 13%; right: 8%;  width: clamp(105px, 12vw, 180px); opacity: 0.5; }
+    .fi-slice-trans-2 { top: 62%; left: 8%;   width: clamp(70px, 8vw, 120px);  opacity: 0.32; }
+    .fi-slice-trans-3 { top: 8%;  left: 14%;  width: clamp(60px, 7vw, 100px);  opacity: 0.28; }
+    .fi-slice-trans-4 { bottom: 10%; right: 18%; width: clamp(85px, 9vw, 140px); opacity: 0.4; }
+    .fi-slice-trans-5 { top: 38%; right: 2%;  width: clamp(55px, 6vw, 90px);   opacity: 0.22; }
+    .fi-slice-trans-6 { bottom: 18%; left: 22%; width: clamp(65px, 7vw, 110px); opacity: 0.3; }
+    .fi-slice-trans-7 { top: 78%; right: 30%; width: clamp(50px, 6vw, 85px);   opacity: 0.2; }
+    .fi-orange-trans-1 { top: 10%; right: 12%; width: clamp(110px, 13vw, 190px); opacity: 0.45; }
+    .fi-orange-trans-2 { bottom: 14%; left: 10%; width: clamp(80px, 9vw, 140px); opacity: 0.35; }
+    .fi-mint-trans { top: 65%; right: 4%; width: clamp(60px, 7vw, 100px); opacity: 0.3; }
+    .fi-orange-cyc-1 { top: -1.8rem; left: -2.6rem; width: clamp(60px, 7vw, 100px);  opacity: 0.55; }
+    .fi-orange-cyc-2 { bottom: -1.8rem; right: -2.6rem; width: clamp(105px, 12vw, 175px); opacity: 0.55; }
+
+    /* ════════════════════════════════════════
+       PRECIOS — escenario interactivo
+    ════════════════════════════════════════ */
+    .exp {
+      max-width: 1200px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: 0.85fr 1.55fr;
+      gap: 3.5rem;
+      align-items: stretch;
+    }
+    .exp-selector {
+      display: flex;
+      flex-direction: column;
+      border-left: 1px solid var(--border);
+    }
+    .exp-pick {
+      appearance: none;
+      background: none;
+      border: none;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      padding: 1.6rem 1.4rem 1.6rem 1.6rem;
+      cursor: pointer;
+      display: flex;
+      align-items: baseline;
+      gap: 0.75rem;
+      position: relative;
+      flex: 1;
+      transition: padding 0.45s cubic-bezier(.22,.61,.36,1), background 0.4s ease;
+    }
+    .exp-pick:last-child { border-bottom: none; }
+    .exp-pick::before {
+      content: '';
+      position: absolute; left: -1px; top: 0; bottom: 0;
+      width: 2px; background: var(--orange);
+      transform: scaleY(0); transform-origin: center;
+      transition: transform 0.45s ease;
+    }
+    .exp-pick:hover { padding-left: 2.2rem; background: rgba(232,108,0,0.025); }
+    .exp-pick.is-active { padding-left: 2.5rem; background: rgba(232,108,0,0.04); }
+    .exp-pick.is-active::before { transform: scaleY(1); }
+    .exp-pick-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.7rem;
+      line-height: 0.8;
+      color: var(--gray);
+      transition: color 0.45s ease;
+    }
+    .exp-pick:hover .exp-pick-num,
+    .exp-pick.is-active .exp-pick-num { color: var(--white); }
+    .exp-pick-lbl {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.58rem; letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--gray);
+    }
+    .exp-pick-tag {
+      margin-left: auto; align-self: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.52rem; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--orange);
+      opacity: 0; transform: translateX(-6px);
+      transition: opacity 0.45s ease, transform 0.45s ease;
+    }
+    .exp-pick.is-active .exp-pick-tag { opacity: 1; transform: none; }
+
+    .exp-stage {
+      position: relative;
+      min-height: 680px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background:
+        radial-gradient(ellipse 120% 75% at 82% 0%, rgba(232,108,0,0.08), transparent 55%),
+        var(--surface);
+      overflow: hidden;
+      box-shadow: 0 40px 120px -60px rgba(0,0,0,0.8);
+    }
+    .exp-stage .botanic { z-index: 1; }
+    .exp-stage-orange {
+      top: -55px; right: -45px; width: 200px; height: 200px;
+      opacity: 0.42; animation: spinSlow 70s linear infinite;
+    }
+    .exp-panel {
+      position: absolute;
+      inset: 0;
+      padding: 2.8rem 3rem 2.6rem;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(26px);
+      transition: opacity 0.6s ease, transform 0.6s cubic-bezier(.22,.61,.36,1);
+      display: flex;
+      flex-direction: column;
+      z-index: 2;
+    }
+    .exp-panel.is-active { opacity: 1; visibility: visible; transform: none; }
+    .exp-panel-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 1rem;
+      padding-bottom: 1.4rem;
+      margin-bottom: 1.6rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .exp-cat {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.62rem; letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--orange);
+    }
+    .exp-people {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 1.05rem;
+      color: var(--gray-light);
+    }
+    .exp-people b { font-family: 'Bebas Neue', sans-serif; font-style: normal; color: var(--white); font-size: 1.5rem; letter-spacing: 0.03em; margin-right: 0.2rem; }
+    .exp-staff {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.6rem; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--gray);
+    }
+    /* Opciones de categoría — el precio es protagonista */
+    .exp-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.1rem;
+      flex: 1;
+    }
+    .exp-opt {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      padding: 1.5rem 1.5rem 1.4rem;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.014);
+      transition: border-color 0.35s ease, background 0.35s ease, transform 0.35s ease;
+    }
+    .exp-opt:hover { border-color: var(--orange-dim); transform: translateY(-3px); }
+    .exp-opt-cat {
+      display: block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.58rem; letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--orange);
+      margin-bottom: 0.5rem;
+    }
+    .exp-opt-name {
+      display: block;
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic; font-size: 1.35rem; line-height: 1.1;
+      color: var(--white);
+      margin-bottom: 0.55rem;
+    }
+    .exp-opt-desc {
+      font-size: 0.75rem; font-weight: 300; line-height: 1.45;
+      color: var(--gray-light);
+    }
+    .exp-opt-price { margin-top: auto; padding-top: 1.2rem; }
+    .exp-opt-amount {
+      display: block;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.5rem, 3.6vw, 3.3rem);
+      letter-spacing: 0.02em; line-height: 0.9;
+      color: var(--white);
+    }
+    .exp-opt-label {
+      display: block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.54rem; letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--gray);
+      margin-top: 0.5rem;
+    }
+    /* Pie del panel: qué incluye + alternativa secundaria */
+    .exp-foot {
+      margin-top: 1.6rem;
+      padding-top: 1.3rem;
+      border-top: 1px solid var(--border);
+    }
+    .exp-incl {
+      font-size: 0.78rem; font-weight: 300; color: var(--gray-light);
+      line-height: 1.5; margin-bottom: 0.7rem;
+    }
+    .exp-incl b { color: var(--white); font-weight: 400; }
+    .exp-solo {
+      font-size: 0.74rem; font-weight: 300; color: var(--gray); line-height: 1.45;
+    }
+    .exp-solo strong { color: var(--gray-light); font-weight: 400; }
+    /* ══ CATEGORÍA GOLD · solo disponible en 100+ ══ */
+    .exp-opt--gold {
+      border-color: var(--gold-dim);
+      background:
+        radial-gradient(ellipse 120% 80% at 80% 0%, var(--gold-glow), transparent 60%),
+        rgba(212,175,55,0.04);
+      box-shadow: inset 0 0 60px -24px var(--gold-glow);
+    }
+    .exp-opt--gold:hover { border-color: var(--gold); transform: translateY(-3px); }
+    .exp-opt--gold .exp-opt-cat { color: var(--gold); font-weight: 500; }
+    .exp-opt--gold .exp-opt-amount {
+      background: var(--gold-sheen);
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent; color: transparent;
+    }
+    .exp-opt-flag {
+      position: absolute; top: 0; right: 1.2rem; transform: translateY(-50%);
+      z-index: 3;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.52rem; letter-spacing: 0.16em; text-transform: uppercase;
+      color: #2A1E07; background: var(--gold-sheen);
+      padding: 0.28rem 0.7rem; font-weight: 600;
+      box-shadow: 0 6px 18px -6px rgba(212,175,55,0.5);
+    }
+    /* Selector: el 100 indica sutilmente que ahí vive Gold */
+    .exp-pick[data-tier="3"] .exp-pick-tag { color: var(--gold); opacity: 1; transform: none; font-weight: 500; }
+    .exp-pick[data-tier="3"].is-active::before { background: var(--gold); }
+    .exp-pick[data-tier="3"].is-active { background: rgba(212,175,55,0.06); }
+
+    @media (max-width: 960px) {
+      .phil-mov { grid-template-columns: 1fr; gap: 2.5rem; }
+      .phil-mov:nth-child(even) .phil-mov-visual { order: 0; }
+      .phil-orb { width: min(78%, 360px); }
+      .float-ingredient { display: none; }
+      .exp { grid-template-columns: 1fr; gap: 1.5rem; }
+      .exp-selector { flex-direction: row; border-left: none; border-top: 1px solid var(--border); overflow-x: auto; }
+      .exp-pick { flex: 1 0 auto; border-bottom: none; border-right: 1px solid var(--border); flex-direction: column; align-items: flex-start; gap: 0.2rem; padding: 1rem 1.2rem !important; }
+      .exp-pick::before { left: 0; right: 0; top: auto; bottom: -1px; width: auto; height: 2px; transform: scaleX(0); }
+      .exp-pick.is-active::before { transform: scaleX(1); }
+      .exp-pick-tag { display: none; }
+      .exp-stage { min-height: 760px; }
+    }
+    @media (max-width: 600px) {
+      .s-philosophy { padding: 4rem 1.5rem 8rem; }
+      .phil-movements { gap: 5.5rem; }
+      .exp-options { grid-template-columns: 1fr; gap: 0.9rem; }
+      .exp-stage { min-height: 1100px; }
+      .exp-panel { padding: 2rem 1.6rem; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .phil-orb, .exp-stage-orange { animation: none; }
+      .botanic { will-change: auto; }
+    }
+
+    /* ══════════════════════════════════════
+       CAT-HEAD — intro compacto + presentación pricing
+    ══════════════════════════════════════ */
+    /* Bloque principal: imagen + título + descripción */
+    .cat-head-pricing {
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+      margin-bottom: 1.5rem;
+      overflow: hidden;
+    }
+    .cat-head-pricing-visual {
+      position: relative;
+      width: clamp(160px, 22vw, 280px);
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+    .cat-head-pricing-visual img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      filter: brightness(0.75) saturate(0.85);
+      display: block;
+    }
+    .cat-head-pricing-visual::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to right, transparent 30%, #050505 90%);
+    }
+    .cat-head-pricing-text {
+      padding-left: 2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .cat-head-pricing-text h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.8rem, 6vw, 5.2rem);
+      font-weight: 300;
+      font-style: italic;
+      line-height: 1.05;
+      color: var(--white);
+      margin-bottom: 0.75rem;
+      letter-spacing: -0.01em;
+    }
+    .cat-head-pricing-text h2 em { color: var(--orange); font-style: italic; }
+
+    /* Descripción compartida */
+    .cat-head-philosophy {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: clamp(0.95rem, 1.6vw, 1.1rem);
+      font-weight: 300;
+      color: var(--gray-light);
+      line-height: 1.6;
+      max-width: 540px;
+    }
+    .cat-head-philosophy em { color: var(--white); font-style: italic; }
+
+    /* Recuadro secundario con "La categoría define..." */
+    .cat-head-intro {
+      padding: 1.1rem 1.5rem;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      margin-bottom: 0.75rem;
+      max-width: 600px;
+    }
+
+    @media (max-width: 600px) {
+      .cat-head-pricing { flex-direction: column; }
+      .cat-head-pricing-visual { width: 100%; height: 180px; }
+      .cat-head-pricing-visual::after {
+        background: linear-gradient(to bottom, transparent 40%, #050505 100%);
+      }
+      .cat-head-pricing-text { padding-left: 0; padding-top: 1.25rem; }
+    }
+
+    /* ══ GOLD VARS globales (usados en Platinum también) ══ */
+    :root {
+      --gold:       #E8C36B;
+      --gold-dim:   rgba(212,175,55,0.45);
+      --gold-glow:  rgba(232,195,107,0.13);
+      --gold-sheen: linear-gradient(105deg, #F6E7B0 0%, #DBB75E 36%, #B07F2E 58%, #F0DA90 100%);
+    }
+
+    /* ══ SERVICIOS BASE siempre incluidos ══ */
+    .exp-base-always {
+      font-size: 0.72rem;
+      font-weight: 300;
+      color: var(--gray);
+      line-height: 1.55;
+      padding: 0.55rem 0.9rem;
+      border-left: 2px solid var(--orange-dim);
+      background: rgba(232,108,0,0.03);
+    }
+    .exp-base-always b { color: var(--gray-light); font-weight: 400; }
+
+    /* ══════════════════════════════════════
+       NUEVO LAYOUT — HORIZONTAL + VERTICAL
+    ══════════════════════════════════════ */
+    .exp-h {
+      max-width: 1200px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* ── Selector horizontal de invitados ── */
+    .exp-h-selector {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      border: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .exp-h-pick {
+      appearance: none;
+      background: none;
+      border: none;
+      border-right: 1px solid var(--border);
+      padding: 1.6rem 1.25rem 1.4rem;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.2rem;
+      position: relative;
+      transition: background 0.3s ease;
+    }
+    .exp-h-pick:last-child { border-right: none; }
+    .exp-h-pick::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--orange);
+      transform: scaleX(0);
+      transform-origin: center;
+      transition: transform 0.35s cubic-bezier(.22,.61,.36,1);
+    }
+    .exp-h-pick.is-active { background: rgba(232,108,0,0.04); }
+    .exp-h-pick.is-active::after { transform: scaleX(1); }
+    .exp-h-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.8rem, 4.5vw, 4rem);
+      letter-spacing: 0.04em;
+      color: var(--gray);
+      line-height: 0.85;
+      transition: color 0.3s;
+    }
+    .exp-h-pick.is-active .exp-h-num,
+    .exp-h-pick:hover .exp-h-num { color: var(--white); }
+    .exp-h-lbl {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.58rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--gray);
+      transition: color 0.3s;
+    }
+    .exp-h-pick.is-active .exp-h-lbl { color: var(--orange); }
+    .exp-h-staff-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.5rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gray);
+      opacity: 0.55;
+      margin-top: 0.35rem;
+    }
+
+    /* ── Divider animado ── */
+    .exp-h-divider {
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--orange-dim) 20%, var(--orange-dim) 80%, transparent);
+    }
+
+    /* ── Filas de categorías ── */
+    .exp-v-cats {
+      border: 1px solid var(--border);
+      border-top: none;
+      background: var(--surface);
+    }
+    .exp-v-cat {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 2rem;
+      align-items: center;
+      padding: 1.8rem 2.5rem;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+      transition: background 0.25s;
+    }
+    .exp-v-cat:last-child { border-bottom: none; }
+    .exp-v-cat:hover { background: rgba(255,255,255,0.014); }
+    .exp-v-cat--gold {
+      background:
+        radial-gradient(ellipse 120% 80% at 80% 0%, var(--gold-glow), transparent 55%),
+        rgba(212,175,55,0.025);
+      border-color: var(--gold-dim);
+    }
+    .exp-v-cat--gold:hover { background: rgba(212,175,55,0.04); }
+
+    .exp-v-cat-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.56rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--orange);
+      display: block;
+      margin-bottom: 0.3rem;
+    }
+    .exp-v-cat--gold .exp-v-cat-tag { color: var(--gold); }
+
+    .exp-v-cat-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: clamp(1.3rem, 2.5vw, 1.8rem);
+      color: var(--white);
+      line-height: 1;
+      margin-bottom: 0.5rem;
+    }
+    .exp-v-cat-desc {
+      font-size: 0.82rem;
+      font-weight: 300;
+      color: var(--gray-light);
+      line-height: 1.5;
+      max-width: 520px;
+    }
+
+    .exp-v-cat-price { text-align: right; flex-shrink: 0; }
+    .exp-v-cat-amount {
+      display: block;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2rem, 3vw, 2.8rem);
+      letter-spacing: 0.02em;
+      line-height: 1;
+      color: var(--white);
+      transition: opacity 0.2s;
+    }
+    .exp-v-cat--gold .exp-v-cat-amount {
+      background: var(--gold-sheen);
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .exp-v-cat-plabel {
+      display: block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.5rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--gray);
+      margin-top: 0.3rem;
+    }
+
+    /* Timer dentro del precio Gold */
+    .exp-v-cat--gold .gold-timer {
+      margin-top: 0.7rem;
+      padding-top: 0.7rem;
+      border-top: 1px solid var(--gold-dim);
+      text-align: right;
+    }
+
+    /* Badge "El más elegido" en la fila Gold */
+    .exp-v-gold-badge {
+      position: absolute;
+      top: 0; right: 2.5rem;
+      transform: translateY(-50%);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.52rem; letter-spacing: 0.16em; text-transform: uppercase;
+      color: #2A1E07; background: var(--gold-sheen);
+      padding: 0.28rem 0.8rem; font-weight: 600;
+      box-shadow: 0 6px 18px -6px rgba(212,175,55,0.5);
+      white-space: nowrap;
+    }
+
+    /* ── Pie del bloque ── */
+    .exp-h-foot {
+      padding: 1.25rem 2.5rem;
+      border: 1px solid var(--border);
+      border-top: none;
+      background: rgba(7,7,7,0.5);
+      display: flex;
+      gap: 1.5rem 3rem;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .exp-h-foot .exp-solo {
+      font-size: 0.74rem; font-weight: 300; color: var(--gray); line-height: 1.45;
+    }
+    .exp-h-foot .exp-solo strong { color: var(--gray-light); font-weight: 400; }
+
+    /* Responsive */
+    @media (max-width: 960px) {
+      .exp-v-cat { padding: 1.5rem 1.75rem; gap: 1.5rem; }
+    }
+    @media (max-width: 600px) {
+      .exp-h-selector { grid-template-columns: repeat(2, 1fr); }
+      .exp-h-pick { padding: 1.2rem 1rem; }
+      .exp-h-num { font-size: 2.5rem; }
+      .exp-h-staff-tag { display: none; }
+      .exp-v-cat { grid-template-columns: 1fr; gap: 0.85rem; padding: 1.4rem 1.25rem; }
+      .exp-v-cat-price { text-align: left; }
+      .exp-v-cat--gold .gold-timer { text-align: left; }
+      .exp-v-gold-badge { right: 1.25rem; }
+      .exp-h-foot { padding: 1.25rem; flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+    }
+
+    /* ══ GOLD TIMER ══ */
+    .gold-timer {
+      margin-top: 0.9rem;
+      padding-top: 0.85rem;
+      border-top: 1px solid var(--gold-dim);
+      text-align: left;
+    }
+    .gold-timer-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.5rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold);
+      display: block;
+      margin-bottom: 0.45rem;
+      opacity: 0.85;
+    }
+    .gold-timer-cols {
+      display: flex;
+      gap: 1.25rem;
+      align-items: flex-start;
+    }
+    .gold-timer-col {
+      display: flex;
+      flex-direction: column;
+    }
+    .gold-timer-val {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.5rem;
+      letter-spacing: 0.06em;
+      line-height: 1;
+      background: var(--gold-sheen);
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent; color: transparent;
+    }
+    .gold-timer-unit {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.48rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--gray);
+      margin-top: 0.2rem;
+    }
+    .gold-timer-expired {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.54rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+
+    /* ══ PLATINUM ══ */
+    .s-platinum {
+      padding: 4.5rem 2.5rem;
+      background: #050505;
+      border-top: 1px solid rgba(212,175,55,0.1);
+      position: relative;
+      overflow: hidden;
+    }
+    .s-platinum::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 60% 70% at 50% 50%, rgba(212,175,55,0.04), transparent 65%);
+      pointer-events: none;
+    }
+    .platinum-inner {
+      max-width: 700px;
+      margin: 0 auto;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+      border: 1px solid rgba(212,175,55,0.16);
+      background: rgba(212,175,55,0.025);
+      padding: 3rem 4rem;
+    }
+    @media (max-width: 600px) {
+      .platinum-inner { padding: 2.5rem 1.75rem; }
+    }
+    .platinum-eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.56rem;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: rgba(212,175,55,0.7);
+      display: block;
+      margin-bottom: 1.1rem;
+    }
+    .platinum-question {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: clamp(1.3rem, 2.8vw, 1.85rem);
+      color: var(--gray-light);
+      margin-bottom: 0.6rem;
+    }
+    .platinum-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      letter-spacing: 0.1em;
+      background: var(--gold-sheen);
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: block;
+      margin-bottom: 1.8rem;
+      line-height: 1;
+    }
+    .platinum-rule {
+      width: 48px;
+      height: 1px;
+      background: linear-gradient(to right, transparent, rgba(212,175,55,0.5), transparent);
+      margin: 0 auto 1.8rem;
+    }
+    .platinum-benefits {
+      list-style: none;
+      display: flex;
+      gap: 1.5rem 3rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 2.2rem;
+    }
+    .platinum-benefits li {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--gray-light);
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+    }
+    .platinum-benefits li::before {
+      content: '';
+      width: 5px;
+      height: 5px;
+      border: 1px solid rgba(212,175,55,0.45);
+      flex-shrink: 0;
+    }
+    .platinum-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(212,175,55,0.85);
+      border: 1px solid rgba(212,175,55,0.3);
+      padding: 0.7rem 1.8rem;
+      transition: background 0.25s, color 0.25s, border-color 0.25s;
+    }
+    .platinum-link:hover {
+      background: rgba(212,175,55,0.1);
+      color: var(--gold);
+      border-color: rgba(212,175,55,0.6);
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <!-- ══ AMBIENT FX — rayos de sol cálidos + brillo difuso + dust naranja ══ -->
+  <div id="ambient-fx" aria-hidden="true">
+    <div class="ambient-glow"></div>
+    <div class="ambient-dust"></div>
+  </div>
+
+  <!-- ══ NAV ══ -->
+  <header class="site-nav" id="siteNav">
+    <a href="#top" style="display:flex;align-items:center;">
+      <span class="brand-lockup brand-lockup--sm">
+        <span class="brand-o">ORANGE</span>
+        <span class="brand-p">Pepper</span>
+      </span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#verano">Verano</a></li>
+      <li><a href="#invierno">Invierno</a></li>
+      <li><a href="#servicio">Servicio</a></li>
+    </ul>
+    <button class="nav-cta" id="navCta" type="button" aria-label="Ir a contacto">
+      <span class="nav-cta-wrap">
+        <span id="lottie-cta" aria-hidden="true"></span>
+        Consultar
+      </span>
+    </button>
+  </header>
+
+
+  <!-- ══════════════════════════════════════
+       1 — HERO
+  ══════════════════════════════════════ -->
+  <section class="s-hero" id="top">
+    <div class="hero-bg" id="heroBg"></div>
+    <div class="hero-grade"></div>
+    <div class="hero-vignette"></div>
+    <!-- Lottie ambient layer: liquid swirl over the hero bg -->
+    <div id="lottie-hero" aria-hidden="true"></div>
+
+    <!-- Columna de identidad, centrada -->
+    <div class="hero-content">
+      <span class="hero-eyebrow gsap-hero-el">Servicio de Cocteles · Coctelería de autor</span>
+      <div class="hero-lockup">
+        <div class="brand-lockup brand-lockup--hero" id="heroBrand">
+          <span class="brand-o gsap-hero-el">ORANGE</span>
+          <span class="brand-p gsap-hero-el">Pepper</span>
+        </div>
+      </div>
+      <div class="hero-rule gsap-hero-el" id="heroRule"></div>
+      <p class="hero-tagline gsap-hero-el">Spicy. <em>Sweet.</em> Spirited.</p>
+    </div>
+
+    <!-- Pie: temporada en vivo · scroll · lugar -->
+    <div class="hero-foot">
+      <span class="hero-season gsap-hero-el" id="heroSeason">
+        <span class="dot"></span><span data-season>En temporada</span>
+      </span>
+      <div class="hero-scroll gsap-hero-el" id="heroScroll">
+        <span>scroll</span>
+        <div class="hero-scroll-arrow"></div>
+      </div>
+      <span class="hero-place gsap-hero-el">Córdoba &middot; Argentina</span>
+    </div>
+  </section>
+
+
+
+
+  <!-- ══════════════════════════════════════
+       2 — MANIFIESTO
+  ══════════════════════════════════════ -->
+  <section class="s-philosophy" id="filosofia">
+
+    <div class="phil-movements">
+
+      <!-- La materia -->
+      <article class="phil-mov">
+        <div class="phil-mov-visual">
+          <div class="phil-orb"><img width="1023" height="943" src="drinknaranja.webp" alt="Cítricos de estación en su punto" loading="lazy"></div>
+        </div>
+        <div class="phil-mov-text reveal-right">
+          <span class="phil-kicker">La materia</span>
+          <h3 class="phil-title">Lo que la estación entrega</h3>
+          <p class="phil-body">
+            Naranja, pimienta, hierbas frescas, botánicos de cosecha. No trabajamos con lo que hay
+            &mdash; trabajamos con lo que está <em>en su punto</em>. Cada carta nace de lo que el mes
+            ofrece, y muere con él.
+          </p>
+          <div class="float-ingredient fi-orange-phil" aria-hidden="true" data-rotate="360" data-drift="60">
+            <img width="1024" height="1024" src="ingr-naranja.webp" alt="" loading="lazy">
+          </div>
+        </div>
+      </article>
+
+      <!-- El oficio -->
+      <article class="phil-mov">
+        <div class="phil-mov-visual">
+          <div class="phil-orb"><video src="Bartenderpourscocktail.mp4" autoplay loop muted playsinline></video></div>
+        </div>
+        <div class="phil-mov-text reveal-left">
+          <span class="phil-kicker">El oficio</span>
+          <h3 class="phil-title">La precisión que no se ve</h3>
+          <p class="phil-body">
+            Óleos cítricos, deshidratados, caviar de cítricos, humo. Detrás de cada copa hay grados,
+            tiempos y gramos exactos. La técnica <em>desaparece</em> para que solo quede el sabor.
+          </p>
+        </div>
+      </article>
+
+
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════
+       4 — EVENT CYCLES
+  ══════════════════════════════════════ -->
+  <section class="s-cycles">
+    <div class="cycles-inner">
+      <!-- ingredientes reales: naranjas en diagonal, pegadas al texto -->
+      <div class="float-ingredient fi-orange-cyc-1" aria-hidden="true" data-rotate="-220" data-drift="50">
+        <img width="1024" height="1024" src="ingr-naranja.webp" alt="" loading="lazy">
+      </div>
+      <div class="float-ingredient fi-orange-cyc-2" aria-hidden="true" data-rotate="200" data-drift="50">
+        <img width="1024" height="1024" src="ingr-naranja.webp" alt="" loading="lazy">
+      </div>
+      <h2 class="cycles-title reveal">
+        Dos cartas.<br><em>Todo el año.</em>
+      </h2>
+      <p class="cycles-body reveal" style="--delay:0.11s">
+        Diseñamos una carta para el verano y otra para el invierno. Cada una usa ingredientes en su punto óptimo &mdash; el estado de ánimo de la temporada, en cada copa.
+      </p>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════
+       5 — SEASON TRANSITION (VERANO, mini)
+  ══════════════════════════════════════ -->
+  <div class="s-transition s-transition--mini" id="seasonTransitionVerano">
+    <div class="transition-sticky" id="transitionStickyVerano">
+      <!-- ingredientes reales: naranjas frescas dando ambiente a VERANO -->
+      <div class="float-ingredient fi-orange-trans-1" aria-hidden="true" data-rotate="180" data-drift="70">
+        <img width="1024" height="1024" src="ingr-naranja.webp" alt="" loading="lazy">
+      </div>
+      <div class="float-ingredient fi-orange-trans-2" aria-hidden="true" data-rotate="-200" data-drift="55">
+        <img width="1024" height="1024" src="ingr-naranja.webp" alt="" loading="lazy">
+      </div>
+      <div class="float-ingredient fi-mint-trans" aria-hidden="true" data-rotate="-120" data-drift="65">
+        <img width="1024" height="1024" src="ingr-menta.webp" alt="" loading="lazy">
+      </div>
+      <div class="transition-word" id="transitionWordVerano">VERANO</div>
+      <p class="transition-sub" id="transitionSubVerano">Verano picante para refrescarse.</p>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════
+       6 — CARTA VERANO
+  ══════════════════════════════════════ -->
+  <section class="s-season s-season--verano" id="verano">
+    <div class="season-header">
+      <div class="season-header-label reveal" style="--delay:0.06s;">
+        <p class="eyebrow" style="margin-bottom:0.5rem;">Carta Verano</p>
+        <span class="brand-lockup brand-lockup--md" style="display:inline-flex; margin-bottom:0.85rem;">
+          <span class="brand-o">ORANGE</span>
+          <span class="brand-p">Pepper</span>
+        </span>
+      </div>
+      <p class="season-desc reveal" style="--delay:0.1s">
+        Los cócteles de verano se presentan en <strong>cerámica artesanal Orange Pepper</strong>, diseñada exclusivamente para cada cóctel.
+      </p>
+    </div>
+
+    <div class="swiper swiper-cocktail swiper-verano">
+      <div class="swiper-wrapper">
+
+        <div class="swiper-slide">
+          <article class="cocktail-panel">
+            <img width="1022" height="943" src="drinksweetspritz.webp" alt="Sweet Spritz">
+            <div class="cp-info">
+              <h3 class="cp-name">Sweet Spritz</h3>
+              <p class="cp-base">Aperol</p>
+              <ul class="cp-ing">
+                <li>Champagne extra dulce</li>
+                <li>Naranja deshidratada</li>
+              </ul>
+            </div>
+          </article>
+        </div>
+
+        <div class="swiper-slide">
+          <article class="cocktail-panel">
+            <img width="1024" height="1024" src="drinksweetmimosa.webp" alt="Sweet Mimosa">
+            <div class="cp-info">
+              <h3 class="cp-name">Sweet Mimosa</h3>
+              <p class="cp-base">Champagne</p>
+              <ul class="cp-ing">
+                <li>Soda stream naranja natural</li>
+                <li>Aceite de naranja</li>
+              </ul>
+            </div>
+          </article>
+        </div>
+
+        <div class="swiper-slide">
+          <article class="cocktail-panel">
+            <img width="1023" height="943" src="drinkbloodyorange.webp" alt="Bloody Orange">
+            <div class="cp-info">
+              <h3 class="cp-name">Bloody Orange</h3>
+              <p class="cp-base">Vodka de apio</p>
+              <ul class="cp-ing">
+                <li>Jugo de naranja y zanahoria</li>
+                <li>Óleo de limón</li>
+                <li>Orange pepper pintado</li>
+              </ul>
+            </div>
+          </article>
+        </div>
+
+        <div class="swiper-slide">
+          <article class="cocktail-panel">
+            <img width="1024" height="1024" src="drinkcosmo.webp" alt="CosmoPepper">
+            <div class="cp-info">
+              <h3 class="cp-name">CosmoPepper</h3>
+              <p class="cp-base">Vodka</p>
+              <ul class="cp-ing">
+                <li>Jugo de arándanos</li>
+                <li>Jugo de limón</li>
+                <li>Óleo de naranja</li>
+                <li>Tajín pintado</li>
+              </ul>
+            </div>
+          </article>
+        </div>
+
+        <div class="swiper-slide">
+          <article class="cocktail-panel">
+            <img width="677" height="677" src="margaritapepper.webp" alt="MargaritaPepper">
+            <div class="cp-info">
+              <h3 class="cp-name">MargaritaPepper</h3>
+              <p class="cp-base">Tequila</p>
+              <ul class="cp-ing">
+                <li>Sirup de naranja</li>
+                <li>Jugo de limón</li>
+                <li>Tajín y óleo cítrico</li>
+              </ul>
+            </div>
+          </article>
+        </div>
+
+      </div>
+      <div class="swiper-pagination"></div>
+      <div class="swiper-button-prev"></div>
+      <div class="swiper-button-next"></div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════
+       7 — SEASON TRANSITION (INVIERNO)
+  ══════════════════════════════════════ -->
+  <div class="s-transition" id="seasonTransition">
+    <div class="transition-sticky" id="transitionSticky">
+      <!-- ingrediente real: rodaja grande detrás de "INV", arriba -->
+      <div class="float-ingredient fi-slice-trans-big" aria-hidden="true" data-rotate="140" data-drift="50">
+        <img width="1024" height="1024" src="ingr-naranja-seca.webp" alt="" loading="lazy">
+      </div>
+      <!-- ingredientes reales: rodajas deshidratadas dando ambiente a INVIERNO -->
+      <div class="float-ingredient fi-slice-trans" aria-hidden="true" data-rotate="200" data-drift="120">
+        <img width="1024" height="1024" src="ingr-naranja-seca.webp" alt="" loading="lazy">
+      </div>
+      <div class="float-ingredient fi-slice-trans-2" aria-hidden="true" data-rotate="-160" data-drift="90">
+        <img width="1024" height="1024" src="ingr-naranja-seca.webp" alt="" loading="lazy">
+      </div>
+      <div class="float-ingredient fi-slice-trans-3" aria-hidden="true" data-rotate="120" data-drift="70">
+        <img width="1024" height="1024" src="ingr-naranja-seca.webp" alt="" loading="lazy">
+      </div>
+      <div class="float-ingredient fi-slice-trans-4" aria-hidden="true" data-rotate="-260" data-drift="100">
+        <img width="1024" height="1024" src="ingr-naranja-seca.webp" alt="" loading="lazy">
+      </div>
+      <div class="float-ingredient fi-slice-trans-5" aria-hidden="true" data-rotate="180" data-drift="60">
+        <img width="1024" height="1024" src="ingr-naranja-seca.webp" alt="" loading="lazy">
+      </div>
+      <div class="float-ingredient fi-slice-trans-6" aria-hidden="true" data-rotate="-140" data-drift="85">
+        <img width="1024" height="1024" src="ingr-naranja-seca.webp" alt="" loading="lazy">
+      </div>
+      <div class="float-ingredient fi-slice-trans-7" aria-hidden="true" data-rotate="240" data-drift="55">
+        <img width="1024" height="1024" src="ingr-naranja-seca.webp" alt="" loading="lazy">
+      </div>
+      <div class="transition-word"  id="transitionWord">INVIERNO</div>
+      <p  class="transition-sub"   id="transitionSub">La noche se vuelve íntima.</p>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════
+       8 — CARTA INVIERNO
+  ══════════════════════════════════════ -->
+  <section class="s-season s-season--invierno" id="invierno">
+    <div class="season-header">
+      <p class="eyebrow reveal">Carta Invierno</p>
+      <h2 class="season-title reveal" style="--delay:0.06s">
+        Dos mundos.<br><em>Una misma noche.</em>
+      </h2>
+    </div>
+
+    <!-- Fila 1: Cremosos -->
+    <div class="cat-banner reveal">
+      <div class="cat-banner-text">
+        <span class="cat-banner-eyebrow">Categoría</span>
+        <h3 class="cat-banner-title">Cremosos</h3>
+        <p class="cat-banner-sub">ricos &middot; envolventes</p>
+      </div>
+      <div class="cat-banner-nav">
+        <div class="swiper-button-prev"></div>
+        <div class="swiper-button-next"></div>
+      </div>
+    </div>
+    <div class="swiper swiper-cocktail swiper-invierno swiper-invierno-cremosos">
+      <div class="swiper-wrapper">
+
+        <div class="swiper-slide">
+          <article class="cocktail-panel">
+            <img width="1536" height="1024" src="drinkdublin.webp" alt="Dublin">
+            <div class="cp-info">
+              <h3 class="cp-name">Dublin</h3>
+              <p class="cp-base">Whisky especiado</p>
+              <ul class="cp-ing">
+                <li>Leche condensada</li>
+                <li>Crema</li>
+                <li>Dulce de leche</li>
+                <li>Pincho de chocolate</li>
+              </ul>
+            </div>
+          </article>
+        </div>
+
+        <div class="swiper-slide">
+          <article class="cocktail-panel">
+            <img width="1536" height="1024" src="drinkojosdepapel.webp" alt="Ojos de Papel">
+            <div class="cp-info">
+              <h3 class="cp-name">Ojos de Papel</h3>
+              <p class="cp-base">Vodka &middot; Brandy</p>
+              <ul class="cp-ing">
+                <li>Almendras</li>
+                <li>Óleo de chía y sésamo</li>
+                <li>Jugo de limón</li>
+                <li>Limón deshidratado</li>
+              </ul>
+            </div>
+          </article>
+        </div>
+
+        <div class="swiper-slide">
+          <article class="cocktail-panel">
+            <img width="1019" height="942" src="drinklavanda.webp" alt="Crema Cosmo">
+            <div class="cp-info">
+              <h3 class="cp-name">Crema Cosmo</h3>
+              <p class="cp-base">Vodka</p>
+              <ul class="cp-ing">
+                <li>Licor de piel de naranja seco</li>
+                <li>Crema con arándanos</li>
+                <li>Óleo de limón</li>
+                <li>Pincho de arándanos</li>
+              </ul>
+            </div>
+          </article>
+        </div>
+
+      </div>
+      <div class="swiper-pagination"></div>
+    </div>
+
+    <!-- Fila 2: Frescos -->
+    <div class="cat-banner reveal">
+      <div class="cat-banner-text">
+        <span class="cat-banner-eyebrow">Categoría</span>
+        <h3 class="cat-banner-title">Frescos</h3>
+        <p class="cat-banner-sub">cítricos &middot; herbales</p>
+      </div>
+      <div class="cat-banner-nav">
+        <div class="swiper-button-prev"></div>
+        <div class="swiper-button-next"></div>
+      </div>
+    </div>
+    <div class="swiper swiper-cocktail swiper-invierno swiper-invierno-frescos">
+      <div class="swiper-wrapper">
+
+        <div class="swiper-slide">
+          <article class="cocktail-panel">
+            <img width="1017" height="939" src="drinkmenta.webp" alt="Real Mojito">
+            <div class="cp-info">
+              <h3 class="cp-name">Real Mojito</h3>
+              <p class="cp-base">Ron especial</p>
+              <ul class="cp-ing">
+                <li>Menta &middot; óleo de limón</li>
+                <li>Champagne dulce y soda</li>
+                <li>Caviar de cítricos</li>
+                <li>Menta fresca</li>
+              </ul>
+            </div>
+          </article>
+        </div>
+
+        <div class="swiper-slide">
+          <article class="cocktail-panel">
+            <img width="1203" height="677" src="drinkpenicilin.webp" alt="Orange Penicillin">
+            <div class="cp-info">
+              <h3 class="cp-name">Orange Penicillin</h3>
+              <p class="cp-base">Bourbon</p>
+              <ul class="cp-ing">
+                <li>Óleo de limón, naranja y jengibre</li>
+                <li>Cítricos y jengibre caramelizado</li>
+              </ul>
+            </div>
+          </article>
+        </div>
+
+        <div class="swiper-slide">
+          <article class="cocktail-panel">
+            <img width="902" height="677" src="drinkchilcanopepperpiscosour.webp" alt="Chill Pepper">
+            <div class="cp-info">
+              <h3 class="cp-name">Chill Pepper</h3>
+              <p class="cp-base">Pisco</p>
+              <ul class="cp-ing">
+                <li>Albumina</li>
+                <li>Óleo de naranja, jengibre y limón</li>
+                <li>Orange pepper espolvoreado</li>
+                <li>Piel de naranja caramelizada</li>
+              </ul>
+            </div>
+          </article>
+        </div>
+
+      </div>
+      <div class="swiper-pagination"></div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════
+       LA BARRA · EL SERVICIO (unificado)
+  ══════════════════════════════════════ -->
+  <section class="s-barra" id="servicio">
+    <div class="barra-image reveal-left">
+      <img width="1023" height="940" src="BarraNoPeoplePic.webp" alt="Servicio de Cocteles Orange Pepper" loading="lazy">
+      <div class="barra-image-fade"></div>
+    </div>
+    <div class="barra-copy">
+      <h2 class="reveal">
+        Un servicio de cócteles<br>de autor que llega <em>a tu puerta.</em>
+      </h2>
+      <p class="barra-lead reveal" style="--delay:0.07s">
+        Nos ocupamos de <em>todo</em> &mdash; vos solo disfrutás la noche.
+      </p>
+      <ul class="barra-list reveal" style="--delay:0.11s">
+        <li>Servicio de cócteles completo &mdash; 7 horas de servicio continuo</li>
+        <li>Estructura modular iluminada</li>
+        <li>Bartenders profesionales con experiencia y presencia</li>
+        <li>Encargado general con amplia trayectoria</li>
+        <li>Cristalería con detalles exclusivos</li>
+        <li>Insumos saludables de primera calidad</li>
+        <li>Hielo premium incluido</li>
+        <li>Servicio de agua incluido</li>
+        <li>Café de grano de calidad incluido</li>
+        <li>Recepción con cocteles sin alcohol</li>
+        <li>Armado, desarmado y limpieza sin costo</li>
+      </ul>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════
+       9b — CATEGORÍAS DE SERVICIO
+  ══════════════════════════════════════ -->
+  <section class="s-categories" id="categorias">
+    <div class="cat-head">
+      <div class="cat-head-pricing reveal">
+        <div class="cat-head-pricing-visual">
+          <img width="1536" height="1024" src="FriendsDrinks3.webp" alt="Hospitalidad Orange Pepper" loading="lazy">
+        </div>
+        <div class="cat-head-pricing-text">
+          <p class="eyebrow">Niveles de servicio</p>
+          <h2>Elegí el ritmo<br>de <em>tu noche.</em></h2>
+          <p class="cat-head-philosophy">
+            Mientras vos disfrutás, nosotros sostenemos la noche entera &mdash; sin contratiempos, sin esperas.<br>
+            Cada evento es una sola noche: irreproducible, irrepetible.
+          </p>
+        </div>
+      </div>
+
+      <div class="cat-head-intro reveal" style="--delay:0.07s">
+        <p class="cat-head-philosophy" style="border:none; padding:0;">
+          <em style="color:var(--orange);font-style:normal;">La categoría</em> define <em style="color:var(--orange);">el ritmo y el límite del consumo</em> &mdash; no la calidad del producto.
+        </p>
+      </div>
+    </div>
+
+    <div class="exp-h reveal" style="--delay:0.08s">
+
+      <!-- Selector horizontal de invitados -->
+      <div class="exp-h-selector" role="tablist" aria-label="Cantidad de invitados">
+        <button class="exp-h-pick" role="tab" data-tier="0" aria-selected="false">
+          <span class="exp-h-num">50</span>
+          <span class="exp-h-lbl">invitados</span>
+          <span class="exp-h-staff-tag">2 bartenders</span>
+        </button>
+        <button class="exp-h-pick" role="tab" data-tier="1" aria-selected="false">
+          <span class="exp-h-num">70</span>
+          <span class="exp-h-lbl">invitados</span>
+          <span class="exp-h-staff-tag">2 bartenders + 1 runner</span>
+        </button>
+        <button class="exp-h-pick" role="tab" data-tier="2" aria-selected="false">
+          <span class="exp-h-num">80</span>
+          <span class="exp-h-lbl">invitados</span>
+          <span class="exp-h-staff-tag">2 bartenders + 1 runner</span>
+        </button>
+        <button class="exp-h-pick" role="tab" data-tier="3" aria-selected="true">
+          <span class="exp-h-num">100+</span>
+          <span class="exp-h-lbl">invitados</span>
+          <span class="exp-h-staff-tag">3 bartenders + 1 runner</span>
+        </button>
+      </div>
+
+      <!-- Separador -->
+      <div class="exp-h-divider"></div>
+
+      <!-- Categorías hacia abajo -->
+      <div class="exp-v-cats">
+
+        <div class="exp-v-cat">
+          <div class="exp-v-cat-info">
+            <span class="exp-v-cat-tag">Categoría 1</span>
+            <span class="exp-v-cat-name">Consumo Equilibrado</span>
+            <p class="exp-v-cat-desc">Puede haber cortes intermedios durante el servicio. Stock limitado.</p>
+          </div>
+          <div class="exp-v-cat-price">
+            <span class="exp-v-cat-amount" data-prices='{"0":2000000,"1":2300000,"2":2500000,"3":2800000}'>$2.800.000</span>
+            <span class="exp-v-cat-plabel">Servicio completo</span>
+          </div>
+        </div>
+
+        <div class="exp-v-cat">
+          <div class="exp-v-cat-info">
+            <span class="exp-v-cat-tag">Categoría 2</span>
+            <span class="exp-v-cat-name">Ritmo Sostenido de Consumo</span>
+            <p class="exp-v-cat-desc">Sin cortes de servicio. Producto limitado al stock contratado. Flujo constante durante todo el evento.</p>
+          </div>
+          <div class="exp-v-cat-price">
+            <span class="exp-v-cat-amount" data-prices='{"0":2250000,"1":2550000,"2":2750000,"3":3100000}'>$3.100.000</span>
+            <span class="exp-v-cat-plabel">Servicio completo</span>
+          </div>
+        </div>
+
+        <div class="exp-v-cat">
+          <div class="exp-v-cat-info">
+            <span class="exp-v-cat-tag">Categoría 3</span>
+            <span class="exp-v-cat-name">Servicio Continuo</span>
+            <p class="exp-v-cat-desc">Sin cortes. Mayor disponibilidad de producto, siempre limitado al stock contratado.</p>
+          </div>
+          <div class="exp-v-cat-price">
+            <span class="exp-v-cat-amount" data-prices='{"0":2500000,"1":2800000,"2":3000000,"3":3300000}'>$3.300.000</span>
+            <span class="exp-v-cat-plabel">Servicio completo</span>
+          </div>
+        </div>
+
+        <div class="exp-v-cat exp-v-cat--gold">
+          <span class="exp-v-gold-badge">El más elegido</span>
+          <div class="exp-v-cat-info">
+            <span class="exp-v-cat-tag">Gold &middot; Categoría 4</span>
+            <span class="exp-v-cat-name">Servicio Fluido</span>
+            <p class="exp-v-cat-desc">Sin cortes &middot; sin límites de stock &middot; bebidas y materias primas exclusivas &middot; mozo bandejero incluido.</p>
+          </div>
+          <div class="exp-v-cat-price">
+            <span class="exp-v-cat-amount" data-prices='{"0":2900000,"1":3200000,"2":3500000,"3":3800000}'>$3.800.000</span>
+            <span class="exp-v-cat-plabel">Servicio completo</span>
+            <div class="gold-timer">
+              <span class="gold-timer-label">Precio vigente hasta fin de mes</span>
+              <div class="gold-timer-cols">
+                <div class="gold-timer-col">
+                  <span class="gold-timer-val"><span class="gt-days">--</span>d</span>
+                  <span class="gold-timer-unit">días</span>
+                </div>
+                <div class="gold-timer-col">
+                  <span class="gold-timer-val"><span class="gt-hours">--</span>h</span>
+                  <span class="gold-timer-unit">horas</span>
+                </div>
+                <div class="gold-timer-col">
+                  <span class="gold-timer-val"><span class="gt-mins">--</span>m</span>
+                  <span class="gold-timer-unit">minutos</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Pie -->
+      <div class="exp-h-foot">
+        <p class="exp-base-always">Incluido siempre: <b>Servicio de agua</b> &middot; <b>Café de grano</b> &middot; <b>Recepción con cocteles sin alcohol</b></p>
+        <p class="exp-solo">¿Solo la coctelería? <strong>5 cócteles de autor &mdash; desde $1.200.000</strong></p>
+      </div>
+
+    </div>
+
+    <p class="price-note reveal">
+      Valores de referencia &middot; Cada evento se cotiza a medida &middot; El servicio Gold incluye mozo bandejero, bebidas, frutas y materias primas exclusivas
+    </p>
+
+  </section>
+
+  <!-- ══ PLATINUM ══ -->
+  <section class="s-platinum">
+    <div class="platinum-inner reveal">
+      <span class="platinum-eyebrow">Experiencia superior</span>
+      <p class="platinum-question">¿Necesitás una experiencia superior?</p>
+      <span class="platinum-name">Servicio Platinum</span>
+      <div class="platinum-rule"></div>
+      <ul class="platinum-benefits">
+        <li>Atención 24 horas</li>
+        <li>Servicio especial bajo consulta</li>
+      </ul>
+      <a href="#contacto" class="platinum-link">Consultar disponibilidad</a>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════
+       10 — ECOSISTEMA
+  ══════════════════════════════════════ -->
+  <section class="s-eco">
+    <p class="eyebrow-light reveal">Servicios asociados</p>
+    <h2 class="eco-title reveal" style="--delay:0.05s">Tu noche, <em>resuelta.</em></h2>
+    <p class="eco-sub reveal" style="--delay:0.09s">Coordinamos cada elemento para que no tengas que pensar en nada.</p>
+    <div class="eco-grid">
+      <div class="eco-item reveal">
+        <div class="eco-icon">&#9835;</div>
+        <p class="eco-name">DJ &middot; Sonido</p>
+        <p class="eco-desc">Profesionales de renombre. Equipos de vanguardia. Selección musical variada.</p>
+      </div>
+      <div class="eco-item reveal" style="--delay:0.04s">
+        <div class="eco-icon">&#9711;</div>
+        <p class="eco-name">Fotografía</p>
+        <p class="eco-desc">Fotógrafos certificados con trayectoria. Edición profesional incluida.</p>
+      </div>
+      <div class="eco-item reveal" style="--delay:0.08s">
+        <div class="eco-icon">&#9654;</div>
+        <p class="eco-name">Video</p>
+        <p class="eco-desc">Producción audiovisual completa. Cobertura del evento y edición final.</p>
+      </div>
+      <div class="eco-item reveal" style="--delay:0.12s">
+        <div class="eco-icon">&#10022;</div>
+        <p class="eco-name">Catering</p>
+        <p class="eco-desc">Servicio de catering disponible para complementar la experiencia.</p>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════
+       11 — GALERÍA
+  ══════════════════════════════════════ -->
+  <section class="s-gallery">
+    <div class="gallery-header">
+      <p class="eyebrow reveal">Momentos</p>
+    </div>
+    <div class="gallery-grid">
+      <div class="gallery-item gallery-item--tall reveal">
+        <img width="928" height="732" src="Foto1.webp" alt="Bartender Orange Pepper" loading="lazy">
+      </div>
+      <div class="gallery-item reveal" style="--delay:0.025s">
+        <img width="1536" height="1024" src="Foto2.webp" alt="Evento Orange Pepper" loading="lazy">
+      </div>
+      <div class="gallery-item reveal" style="--delay:0.05s">
+        <img width="1536" height="1024" src="Foto3.webp" alt="Evento privado" loading="lazy">
+      </div>
+      <div class="gallery-item reveal" style="--delay:0.03s">
+        <img width="1408" height="768" src="Foto4.webp" alt="Amigos en evento" loading="lazy">
+      </div>
+      <div class="gallery-item reveal" style="--delay:0.06s">
+        <img width="1536" height="1024" src="FriendsDrinks2.webp" alt="Brindis entre amigos en la barra" loading="lazy">
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════
+       12 — CONTACTO
+  ══════════════════════════════════════ -->
+  <section class="s-contact" id="contacto">
+    <div class="contact-inner">
+      <p class="eyebrow-light reveal">¿Próximo evento?</p>
+      <h2 class="contact-title reveal" style="--delay:0.06s">
+        Contanos sobre<br><em>tu noche.</em>
+      </h2>
+      <p class="contact-body reveal" style="--delay:0.11s">
+        Cada evento es único. Nos adaptamos a tu idea, tu escala y tu presupuesto &mdash; para que la experiencia sea exactamente como la imaginás.
+      </p>
+      <a href="mailto:orangepepperoficina@gmail.com" class="contact-email reveal" style="--delay:0.16s">
+        orangepepperoficina@gmail.com
+      </a>
+      <p class="contact-note reveal" style="--delay:0.21s">Córdoba, Argentina &nbsp;&middot;&nbsp; Respondemos en menos de 24 hs.</p>
+    </div>
+  </section>
+
+
+  <!-- ══ FOOTER ══ -->
+  <footer class="site-footer">
+    <a href="#top">
+      <span class="brand-lockup brand-lockup--sm">
+        <span class="brand-o">ORANGE</span>
+        <span class="brand-p">Pepper</span>
+      </span>
+    </a>
+    <ul class="footer-links">
+      <li><a href="#verano">Carta Verano</a></li>
+      <li><a href="#invierno">Carta Invierno</a></li>
+    </ul>
+    <p class="footer-copy">&copy; 2026 Orange Pepper &middot; C&oacute;rdoba</p>
+  </footer>
+
+
+  <script>
+    /* ══════════════════════════════════════
+       INIT — runs as soon as el HTML está parseado.
+       Los scripts con "defer" (GSAP, ScrollTrigger, Lottie, Swiper)
+       ya se ejecutaron para este momento, así que no hace falta
+       esperar a window 'load' (que demora hasta que cargan TODAS
+       las imágenes y fuentes — eso es lo que hacía que el contenido
+       apareciera tarde al scrollear).
+    ══════════════════════════════════════ */
+    document.addEventListener('DOMContentLoaded', function () {
+
+      /* ── Red de seguridad: si por cualquier motivo (CDN caído,
+         conexión lenta, error de script) los reveals no se activaron
+         solos en unos segundos, los mostramos a la fuerza para que
+         nunca quede contenido invisible permanentemente. ── */
+      setTimeout(() => {
+        document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .gsap-hero-el')
+          .forEach(el => el.classList.add('is-visible'));
+        document.querySelectorAll('.gsap-hero-el').forEach(el => {
+          el.style.opacity = '1';
+        });
+      }, 3500);
+
+      /* ── HERO: chip de temporada en vivo ──
+         Hemisferio sur: Abr–Sep = Invierno, resto = Verano. Refleja
+         cuál de las dos cartas está activa y tiñe el punto con el
+         acento de la estación, sin tocar el theming global del body. */
+      (function () {
+        const chip = document.getElementById('heroSeason');
+        if (!chip) return;
+        const m = new Date().getMonth();              /* 0 = enero */
+        const invierno = (m >= 3 && m <= 8);
+        const label = chip.querySelector('[data-season]');
+        if (label) label.textContent = 'Temporada de ' + (invierno ? 'Invierno' : 'Verano');
+        chip.style.setProperty('--season-accent', invierno ? '#7CB8D4' : 'var(--orange)');
+      })();
+
+      /* ── NAV: appear on scroll ── */
+      const nav = document.getElementById('siteNav');
+      window.addEventListener('scroll', () => {
+        nav.classList.toggle('scrolled', window.scrollY > 70);
+      }, { passive: true });
+
+      /* ── CONSULTAR: scroll directo a #contacto ──
+         Usamos <button> (sin href) para que el browser no dispare NINGÚN
+         scroll nativo. El JS calcula la posición real en el momento del clic,
+         con las imágenes ya cargadas. Un flag evita que clics múltiples
+         interrumpan el scroll en curso. ── */
+      let scrollingToContact = false;
+      document.getElementById('navCta').addEventListener('click', function () {
+        if (scrollingToContact) return;           /* ignorar clics extra */
+        const target = document.getElementById('contacto');
+        if (!target) return;
+        scrollingToContact = true;
+        const y = target.getBoundingClientRect().top + window.scrollY;
+        window.scrollTo({ top: y, behavior: 'smooth' });
+        /* Liberar el flag cuando el scroll termina (máx 1.5s) */
+        setTimeout(() => { scrollingToContact = false; }, 1500);
+      });
+
+      /* ── Todos los links internos (#hash): mismo fix de scroll preciso ── */
+      document.querySelectorAll('a[href^="#"]').forEach(link => {
+        if (link.id === 'navCta') return; /* ya tiene handler propio */
+        link.addEventListener('click', function (e) {
+          const hash = this.getAttribute('href');
+          if (!hash || hash === '#') return;
+          const target = document.querySelector(hash);
+          if (!target) return;
+          e.preventDefault();
+          const y = target.getBoundingClientRect().top + window.scrollY;
+          window.scrollTo({ top: y, behavior: 'smooth' });
+        });
+      });
+
+      /* ── HERO BG: subtle zoom-out on load ── */
+      const heroBg = document.getElementById('heroBg');
+      requestAnimationFrame(() => {
+        setTimeout(() => heroBg.classList.add('loaded'), 80);
+      });
+
+      /* ══════════════════════════════════════
+         LOTTIE — Hero ambient liquid swirl
+         Uses a free Lottie from LottieFiles (bokeh/particles, warm tones)
+         Fallback: silent if fetch fails (GitHub Pages safe)
+      ══════════════════════════════════════ */
+      if (typeof lottie !== 'undefined') {
+        /* Inline minimal Lottie JSON: slow rotating orange smoke rings */
+        const lottieSmokeData = {
+          "v":"5.7.8","fr":24,"ip":0,"op":240,"w":1920,"h":1080,"nm":"smoke",
+          "ddd":0,"assets":[],"layers":[{
+            "ddd":0,"ind":1,"ty":4,"nm":"ring1","sr":1,"ks":{
+              "o":{"a":1,"k":[{"i":{"x":[0.5],"y":[1]},"o":{"x":[0.5],"y":[0]},"t":0,"s":[0]},{"i":{"x":[0.5],"y":[1]},"o":{"x":[0.5],"y":[0]},"t":60,"s":[45]},{"t":240,"s":[0]}]},
+              "r":{"a":1,"k":[{"t":0,"s":[0]},{"t":240,"s":[360]}]},
+              "p":{"a":0,"k":[960,540,0]},
+              "s":{"a":1,"k":[{"t":0,"s":[80,80,100]},{"t":240,"s":[140,140,100]}]}
+            },
+            "ao":0,"shapes":[{
+              "ty":"gr","it":[{
+                "ty":"el","p":{"a":0,"k":[0,0]},"s":{"a":0,"k":[600,600]}
+              },{
+                "ty":"st","c":{"a":0,"k":[0.91,0.42,0,1]},"o":{"a":0,"k":20},"w":{"a":0,"k":3}
+              },{
+                "ty":"tr","p":{"a":0,"k":[0,0]},"s":{"a":0,"k":[100,100]}
+              }]
+            }],
+            "ip":0,"op":240,"st":0
+          }]
+        };
+
+        lottie.loadAnimation({
+          container: document.getElementById('lottie-hero'),
+          renderer: 'svg',
+          loop: true,
+          autoplay: true,
+          animationData: lottieSmokeData
+        });
+
+        /* Lottie CTA micro-icon: simple pulse dot */
+        const lottieDotData = {
+          "v":"5.7.8","fr":30,"ip":0,"op":60,"w":60,"h":60,"nm":"dot","ddd":0,"assets":[],"layers":[{
+            "ddd":0,"ind":1,"ty":4,"nm":"dot","sr":1,"ks":{
+              "o":{"a":0,"k":100},
+              "p":{"a":0,"k":[30,30,0]},
+              "s":{"a":1,"k":[{"i":{"x":[0.5],"y":[1]},"o":{"x":[0.5],"y":[0]},"t":0,"s":[100,100,100]},{"i":{"x":[0.5],"y":[1]},"o":{"x":[0.5],"y":[0]},"t":30,"s":[130,130,100]},{"t":60,"s":[100,100,100]}]}
+            },
+            "ao":0,"shapes":[{
+              "ty":"gr","it":[{
+                "ty":"el","p":{"a":0,"k":[0,0]},"s":{"a":0,"k":[18,18]}
+              },{
+                "ty":"fl","c":{"a":0,"k":[0.91,0.42,0,1]},"o":{"a":0,"k":100}
+              },{
+                "ty":"tr","p":{"a":0,"k":[0,0]},"s":{"a":0,"k":[100,100]}
+              }]
+            }],
+            "ip":0,"op":60,"st":0
+          }]
+        };
+
+        const ctaEl = document.getElementById('lottie-cta');
+        if (ctaEl) {
+          lottie.loadAnimation({
+            container: ctaEl,
+            renderer: 'svg',
+            loop: true,
+            autoplay: true,
+            animationData: lottieDotData
+          });
+        }
+      }
+
+      /* ══════════════════════════════════════
+         GSAP — Hero entrance timeline
+      ══════════════════════════════════════ */
+      if (typeof gsap !== 'undefined') {
+        gsap.registerPlugin(ScrollTrigger);
+
+        /* ── FIX: recalcular las posiciones de ScrollTrigger cada vez
+           que una imagen lazy termina de cargar. Sin esto, a medida que
+           bajás y las imágenes van cargando, la página "se mueve" y
+           ScrollTrigger sigue usando posiciones viejas — por eso el
+           contenido empieza a aparecer cada vez más tarde a medida que
+           se sigue scrolleando. ── */
+        (function () {
+          let refreshTimer;
+          const scheduleRefresh = (delay) => {
+            clearTimeout(refreshTimer);
+            refreshTimer = setTimeout(() => ScrollTrigger.refresh(true), delay || 80);
+          };
+
+          /* Cada imagen lazy que termina de cargar puede mover el layout */
+          document.querySelectorAll('img').forEach(img => {
+            if (img.complete) return;
+            img.addEventListener('load',  () => scheduleRefresh(80),  { once: true });
+            img.addEventListener('error', () => scheduleRefresh(80), { once: true });
+          });
+
+          /* Refreshes escalonados después del load completo:
+             las imágenes lazy siguen cargando mientras el usuario scrollea,
+             así que refrescamos a los 200ms, 600ms y 1.5s como red de seguridad */
+          window.addEventListener('load', () => {
+            scheduleRefresh(200);
+            setTimeout(() => ScrollTrigger.refresh(true), 600);
+            setTimeout(() => ScrollTrigger.refresh(true), 1500);
+          });
+
+          /* ResizeObserver: detecta cambios de tamaño del documento entero
+             (causados por imágenes que cargan fuera de pantalla) */
+          if (typeof ResizeObserver !== 'undefined') {
+            const ro = new ResizeObserver(() => scheduleRefresh(120));
+            ro.observe(document.body);
+          }
+        })();
+
+        /* Hero entrance — secuencia orquestada: la foto sale de un zoom
+           lento mientras la identidad sube por partes y el pie aterriza. */
+        const heroTl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+        heroTl
+          .to('#heroBg', { scale: 1, duration: 2.6, ease: 'power2.out' }, 0)
+          .fromTo('.hero-eyebrow',
+              { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.9 }, 0.25)
+          .fromTo('#heroBrand .brand-o',
+              { opacity: 0, y: 28 }, { opacity: 1, y: 0, duration: 1.0 }, 0.45)
+          .fromTo('#heroBrand .brand-p',
+              { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 1.0 }, 0.63)
+          .fromTo('#heroRule',
+              { opacity: 0, scaleX: 0 }, { opacity: 1, scaleX: 1, duration: 0.9, ease: 'power2.inOut' }, 0.95)
+          .fromTo('.hero-tagline',
+              { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.9 }, 1.05)
+          .fromTo('.hero-foot .gsap-hero-el',
+              { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.9, stagger: 0.12 }, 1.25);
+
+        /* ── GSAP ScrollTrigger: section reveals ── */
+        const revealTargets = document.querySelectorAll('.reveal, .reveal-left, .reveal-right');
+        revealTargets.forEach(el => {
+          /* Skip hero — already handled above */
+          if (el.closest('.s-hero')) return;
+
+          const isLeft  = el.classList.contains('reveal-left');
+          const isRight = el.classList.contains('reveal-right');
+          const xFrom   = isLeft ? -35 : isRight ? 35 : 0;
+          const yFrom   = (!isLeft && !isRight) ? 30 : 0;
+          const delay   = parseFloat(getComputedStyle(el).getPropertyValue('--delay')) || 0;
+
+          gsap.fromTo(el,
+            { opacity: 0, x: xFrom, y: yFrom },
+            {
+              opacity: 1, x: 0, y: 0,
+              duration: 0.9,
+              delay: delay,
+              ease: 'power2.out',
+              scrollTrigger: {
+                trigger: el,
+                start: 'top 88%',
+                toggleActions: 'play none none none'
+              }
+            }
+          );
+          /* Mark as handled so IntersectionObserver doesn't double-fire */
+          el.dataset.gsapHandled = '1';
+        });
+
+        /* ── GSAP: Season transition text orchestration (verano + invierno) ── */
+        function animateSeasonTransition(sectionId, wordId, subId) {
+          const transSection = document.getElementById(sectionId);
+          if (!transSection) return;
+          const transWord = document.getElementById(wordId);
+          const transSub  = document.getElementById(subId);
+
+          gsap.fromTo(transWord,
+            { opacity: 0, scale: 0.68 },
+            {
+              opacity: 1, scale: 1,
+              ease: 'none',
+              scrollTrigger: {
+                trigger: transSection,
+                start: 'top bottom',
+                end: 'bottom top',
+                scrub: 1
+              }
+            }
+          );
+          gsap.fromTo(transSub,
+            { opacity: 0, y: 20 },
+            {
+              opacity: 1, y: 0,
+              ease: 'none',
+              scrollTrigger: {
+                trigger: transSection,
+                start: '30% bottom',
+                end: '70% center',
+                scrub: 1.5
+              }
+            }
+          );
+        }
+        animateSeasonTransition('seasonTransitionVerano', 'transitionWordVerano', 'transitionSubVerano');
+        animateSeasonTransition('seasonTransition', 'transitionWord', 'transitionSub');
+
+        /* ── GSAP: Invierno season color theme toggle ── */
+        ScrollTrigger.create({
+          trigger: '.s-season--invierno',
+          start: 'top 60%',
+          end: 'bottom 40%',
+          onEnter: () => document.body.classList.add('is-invierno'),
+          onLeaveBack: () => document.body.classList.remove('is-invierno')
+        });
+
+        /* ── GSAP: Manifesto ghost word parallax ── */
+        const ghost = document.querySelector('.manifesto-ghost');
+        if (ghost) {
+          gsap.to(ghost, {
+            x: -60,
+            ease: 'none',
+            scrollTrigger: {
+              trigger: '.s-manifesto',
+              start: 'top bottom',
+              end: 'bottom top',
+              scrub: 1.5
+            }
+          });
+        }
+
+        /* ── GSAP: Ingredientes reales flotando + girando con el scroll ── */
+        gsap.utils.toArray('.float-ingredient:not(.fi-mint-phil)').forEach((el) => {
+          const rot   = parseFloat(el.dataset.rotate) || 0;
+          const drift = parseFloat(el.dataset.drift)  || 80;
+          const trigger = el.closest('section, .s-transition') || el.parentElement;
+          gsap.fromTo(el,
+            { y: drift, rotation: 0 },
+            {
+              y: -drift, rotation: rot,
+              ease: 'none',
+              scrollTrigger: {
+                trigger: trigger,
+                start: 'top bottom',
+                end: 'bottom top',
+                scrub: 1.2
+              }
+            }
+          );
+        });
+
+        /* ── GSAP: Filosofía — escenas que transicionan con el scroll ── */
+        gsap.utils.toArray('.phil-mov').forEach((mov) => {
+          const visual = mov.querySelector('.phil-mov-visual');
+          if (visual) {
+            gsap.fromTo(visual,
+              { y: 80 },
+              {
+                y: -80,
+                ease: 'none',
+                scrollTrigger: {
+                  trigger: mov,
+                  start: 'top bottom',
+                  end: 'bottom top',
+                  scrub: 1.1
+                }
+              }
+            );
+          }
+        });
+
+      } else {
+        /* Fallback: run original IntersectionObserver if GSAP didn't load */
+        const revealEls = document.querySelectorAll('.reveal, .reveal-left, .reveal-right');
+        const io = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              io.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.1, rootMargin: '0px 0px -10% 0px' });
+        revealEls.forEach(el => {
+          if (el.closest('.s-hero')) {
+            setTimeout(() => el.classList.add('is-visible'), 100);
+          } else {
+            io.observe(el);
+          }
+        });
+      }
+
+      /* ══════════════════════════════════════
+         SWIPER — Cocktail carousels
+      ══════════════════════════════════════ */
+      if (typeof Swiper !== 'undefined') {
+        const swiperConfig = {
+          slidesPerView: 'auto',
+          centeredSlides: true,
+          spaceBetween: 28,
+          loop: false,
+          /* Sin autoplay: el carrusel arranca quieto centrado en el trago
+             del medio y solo se mueve si el usuario interactúa. */
+          pagination: {
+            el: '.swiper-pagination',
+            clickable: true
+          },
+          navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev'
+          },
+          keyboard: { enabled: true },
+          grabCursor: true,
+          a11y: {
+            prevSlideMessage: 'Cóctel anterior',
+            nextSlideMessage: 'Cóctel siguiente'
+          },
+          breakpoints: {
+            0: {
+              spaceBetween: 14,
+              centeredSlides: true
+            },
+            960: {
+              spaceBetween: 28,
+              centeredSlides: true
+            }
+          }
+        };
+
+        /* Each swiper gets its own nav/pagination scoped to its container */
+        document.querySelectorAll('.swiper-cocktail').forEach(container => {
+          const startIndex = container.classList.contains('swiper-verano') ? 1
+            : container.classList.contains('swiper-invierno-frescos') ? 1
+            : container.classList.contains('swiper-invierno-cremosos') ? 1
+            : 0;
+
+          /* Cremosos / Frescos: las flechas viven en el cat-banner de arriba
+             (al lado del texto), no dentro del propio carrusel. Verano no
+             tiene cat-banner, así que sus flechas siguen flotando sobre
+             las imágenes como antes. */
+          const prevSibling = container.previousElementSibling;
+          const navHost = (prevSibling && prevSibling.classList.contains('cat-banner'))
+            ? prevSibling
+            : container;
+
+          /* init:false + init() manual diferido a doble requestAnimationFrame:
+             así Swiper mide el ancho real del contenedor ya pintado por el
+             navegador, en vez de medir en el instante síncrono en que el
+             script corre (que es lo que producía el slide inicial
+             descentrado, con un hueco a la izquierda). */
+          const mySwiper = new Swiper(container, {
+            ...swiperConfig,
+            init: false,
+            initialSlide: startIndex,
+            navigation: {
+              nextEl: navHost.querySelector('.swiper-button-next'),
+              prevEl: navHost.querySelector('.swiper-button-prev')
+            },
+            pagination: {
+              el: container.querySelector('.swiper-pagination'),
+              clickable: true
+            }
+          });
+
+          function forceRecenter() {
+            mySwiper.updateSize();
+            mySwiper.updateSlides();
+            mySwiper.updateProgress();
+            mySwiper.updateSlidesClasses();
+            mySwiper.slideTo(startIndex, 0, false);
+          }
+
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              mySwiper.init();
+              forceRecenter();
+            });
+          });
+
+          /* Recalcula cuando cada imagen de las slides termina de cargar,
+             porque el ancho real cambia el centrado de Swiper. */
+          container.querySelectorAll('img').forEach(img => {
+            if (img.complete) return;
+            img.addEventListener('load', forceRecenter, { once: true });
+          });
+
+          /* Pasadas de seguridad adicionales: fuentes web cargando tarde,
+             animaciones "reveal" terminando, reflow tardío del navegador. */
+          setTimeout(forceRecenter, 250);
+          setTimeout(forceRecenter, 600);
+          window.addEventListener('load', () => {
+            forceRecenter();
+            setTimeout(forceRecenter, 300);
+          });
+          window.addEventListener('resize', forceRecenter);
+          if (document.fonts && document.fonts.ready) {
+            document.fonts.ready.then(forceRecenter);
+          }
+        });
+      }
+
+      /* ══════════════════════════════════════
+         PRICING — selector horizontal + precios por tier
+      ══════════════════════════════════════ */
+      (function () {
+        const picks = Array.from(document.querySelectorAll('.exp-h-pick'));
+        if (!picks.length) return;
+
+        const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        function countUp(el, target) {
+          if (reduce) { el.textContent = '$' + target.toLocaleString('es-AR'); return; }
+          const dur = 600, t0 = performance.now();
+          (function step(now) {
+            const k = Math.min(1, (now - t0) / dur);
+            const e = 1 - Math.pow(1 - k, 3);
+            el.textContent = '$' + Math.round(target * e).toLocaleString('es-AR');
+            if (k < 1) requestAnimationFrame(step);
+          })(performance.now());
+        }
+
+        function activate(tier) {
+          picks.forEach((p, idx) => {
+            const on = idx === tier;
+            p.classList.toggle('is-active', on);
+            p.setAttribute('aria-selected', on ? 'true' : 'false');
+          });
+
+          document.querySelectorAll('[data-prices]').forEach(el => {
+            const prices = JSON.parse(el.dataset.prices);
+            const target = prices[tier];
+            if (target !== undefined) countUp(el, target);
+          });
+        }
+
+        /* Click y hover activan el tier. El hover (mouseenter) lo muestra
+           sin necesidad de clickear; el guard evita re-disparar el conteo
+           si ya está activo. En touch no hay hover, así que el click manda. */
+        picks.forEach((p, i) => {
+          p.addEventListener('click', () => activate(i));
+          p.addEventListener('mouseenter', () => {
+            if (!p.classList.contains('is-active')) activate(i);
+          });
+        });
+
+        /* Activar el último tier (100+) por defecto */
+        activate(picks.length - 1);
+      })();
+
+      /* ══════════════════════════════════════
+         GOLD TIMER — cuenta regresiva al fin del mes actual
+         Corre en todos los cards Gold de todos los paneles.
+      ══════════════════════════════════════ */
+      (function () {
+        function pad(n) { return String(n).padStart(2, '0'); }
+
+        function tick() {
+          const now        = new Date();
+          const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1, 0, 0, 0);
+          const diff       = endOfMonth - now;
+
+          if (diff <= 0) {
+            document.querySelectorAll('.gold-timer').forEach(el => {
+              el.innerHTML = '<span class="gold-timer-expired">Tarifa actualizada &mdash; Consultá el nuevo precio</span>';
+            });
+            return;
+          }
+
+          const d = Math.floor(diff / 86400000);
+          const h = Math.floor((diff % 86400000) / 3600000);
+          const m = Math.floor((diff % 3600000)  / 60000);
+
+          document.querySelectorAll('.gt-days').forEach(el  => { el.textContent = pad(d); });
+          document.querySelectorAll('.gt-hours').forEach(el => { el.textContent = pad(h); });
+          document.querySelectorAll('.gt-mins').forEach(el  => { el.textContent = pad(m); });
+        }
+
+        tick();
+        setInterval(tick, 30000);
+      })();
+
+      /* Slow-motion orb video — loop primeros 4s */
+      document.querySelectorAll('.phil-orb video').forEach(function(v) {
+        v.loop = false;
+        v.playbackRate = 0.45;
+        v.addEventListener('loadedmetadata', function() { v.playbackRate = 0.45; });
+        v.addEventListener('timeupdate', function() {
+          if (v.currentTime >= 4) v.currentTime = 0;
+        });
+      });
+
+    }); /* end DOMContentLoaded */
+  </script>
+
+</body>
+</html>
