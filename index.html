@@ -3188,6 +3188,10 @@
                   <span class="gold-timer-val"><span class="gt-mins">--</span>m</span>
                   <span class="gold-timer-unit">minutos</span>
                 </div>
+                <div class="gold-timer-col">
+                  <span class="gold-timer-val"><span class="gt-secs">--</span>s</span>
+                  <span class="gold-timer-unit">segundos</span>
+                </div>
               </div>
             </div>
           </div>
@@ -3861,14 +3865,16 @@
           const d = Math.floor(diff / 86400000);
           const h = Math.floor((diff % 86400000) / 3600000);
           const m = Math.floor((diff % 3600000)  / 60000);
+          const s = Math.floor((diff % 60000)    / 1000);
 
           document.querySelectorAll('.gt-days').forEach(el  => { el.textContent = pad(d); });
           document.querySelectorAll('.gt-hours').forEach(el => { el.textContent = pad(h); });
           document.querySelectorAll('.gt-mins').forEach(el  => { el.textContent = pad(m); });
+          document.querySelectorAll('.gt-secs').forEach(el  => { el.textContent = pad(s); });
         }
 
         tick();
-        setInterval(tick, 30000);
+        setInterval(tick, 1000);
       })();
 
       /* Slow-motion orb video — loop primeros 4s */
