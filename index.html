@@ -1089,6 +1089,165 @@
     }
 
     /* ══════════════════════════════════════
+       CARTA VERANO — Summer Cocktail Showcase
+       Presentación tipo campaña de lujo: un cóctel protagonista en
+       el centro y los otros 4 flotando alrededor con rotación y
+       profundidad. Click en un preview lo vuelve protagonista, con
+       transiciones lentas de opacity / scale / blur / color (el
+       tema de color cambia según el trago activo, via --vibe).
+    ══════════════════════════════════════ */
+    .scs {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 0 6vw 3.5rem;
+      --vibe: #E8731E;     /* acento (puntitos, flechas, textos) */
+      --shot: #0d0d0d;     /* color de fondo real de la foto activa */
+    }
+
+    /* Escenario — composición lado a lado: hero a la izquierda,
+       panel de detalle flotando a la derecha superpuesto. */
+    .scs-stage {
+      position: relative;
+      display: flex; align-items: center; justify-content: flex-start;
+      min-height: clamp(420px, 50vw, 600px);
+      isolation: isolate;
+    }
+    .scs-glow { display: none; }
+
+    /* Hero protagonista — MARCO más grande que la foto, con el fondo
+       pintado del color real de la imagen (la foto vive adentro) y un
+       halo del mismo color para fundirse con el fondo del sitio. */
+    .scs-hero {
+      position: relative; z-index: 1;
+      width: clamp(300px, 53%, 600px);
+      aspect-ratio: 1 / 1;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--shot);
+      box-shadow: 0 44px 90px rgba(0,0,0,0.45),
+                  0 0 120px 12px color-mix(in srgb, var(--shot) 38%, transparent);
+      overflow: hidden;
+      transition: background 0.8s ease, box-shadow 0.8s ease;
+    }
+    .scs-hero-img {
+      position: absolute; inset: 0; margin: auto;
+      max-width: 84%; max-height: 84%;
+      width: auto; height: auto; object-fit: contain;
+      opacity: 0;
+      transform: translateY(10px) scale(0.94);
+      transition: opacity 0.7s ease,
+                  transform 0.75s cubic-bezier(0.22,0.61,0.36,1);
+      pointer-events: none;
+    }
+    .scs-hero-img.is-active { opacity: 1; transform: none; }
+
+    /* Controles: flecha · 5 puntitos · flecha (estilo hero de cine) */
+    .scs-controls {
+      display: flex; align-items: center; justify-content: center;
+      gap: 1.5rem;
+      margin: 1.6rem auto 2rem;
+    }
+    .scs-arrow {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 2.6rem; height: 2.6rem;
+      padding: 0; margin: 0; cursor: pointer;
+      color: var(--gray-light);
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      transition: color 0.35s ease, border-color 0.35s ease,
+                  background 0.35s ease, transform 0.35s ease;
+    }
+    .scs-arrow:hover, .scs-arrow:focus-visible {
+      color: #0c0c0c;
+      background: var(--vibe);
+      border-color: var(--vibe);
+      transform: translateY(-2px);
+      outline: none;
+    }
+    .scs-dots {
+      display: flex; align-items: center; gap: 0.55rem;
+    }
+    .scs-dot {
+      width: 8px; height: 8px; padding: 0; margin: 0;
+      border: none; border-radius: 999px; cursor: pointer;
+      background: color-mix(in srgb, var(--white) 28%, transparent);
+      transition: width 0.5s cubic-bezier(0.22,0.61,0.36,1),
+                  background 0.5s ease;
+    }
+    .scs-dot:hover { background: color-mix(in srgb, var(--white) 55%, transparent); }
+    .scs-dot:focus-visible { outline: 2px solid var(--vibe); outline-offset: 3px; }
+    .scs-dot.is-active {
+      width: 30px;
+      background: var(--vibe);
+    }
+
+    /* Panel de detalle */
+    .scs-detail {
+      max-width: 600px; margin: 0.5rem auto 0;
+      text-align: center;
+    }
+    .scs-detail-base {
+      display: inline-block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.6rem; letter-spacing: 0.24em; text-transform: uppercase;
+      color: var(--vibe); margin-bottom: 0.7rem;
+      transition: color 0.6s ease;
+    }
+    .scs-detail-name {
+      font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 400;
+      font-size: clamp(2.3rem, 4.6vw, 3.4rem); line-height: 1; color: var(--white);
+      margin-bottom: 0.9rem;
+    }
+    .scs-detail-desc {
+      font-size: 0.98rem; font-weight: 300; color: var(--gray-light);
+      line-height: 1.55; max-width: 480px; margin: 0 auto 1.2rem;
+    }
+    .scs-detail-ing {
+      list-style: none; display: flex; flex-wrap: wrap;
+      justify-content: center; gap: 0.4rem 0.9rem;
+      margin-bottom: 1.7rem;
+    }
+    .scs-detail-ing li {
+      position: relative;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--gray);
+    }
+    .scs-detail-ing li + li::before {
+      content: '·'; position: absolute; left: -0.55rem; color: var(--vibe);
+    }
+    .scs-detail-ing { margin-bottom: 0; }
+    /* Re-anima el texto del detalle al cambiar de cóctel */
+    .scs-detail.swap > * { animation: scsFade 0.6s ease both; }
+    .scs-detail.swap > *:nth-child(2) { animation-delay: 0.04s; }
+    .scs-detail.swap > *:nth-child(3) { animation-delay: 0.08s; }
+    .scs-detail.swap > *:nth-child(4) { animation-delay: 0.12s; }
+    @keyframes scsFade {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: none; }
+    }
+
+    /* Tablet */
+    @media (max-width: 1024px) {
+      .scs-hero { width: min(460px, 74%); }
+    }
+
+    /* Mobile */
+    @media (max-width: 560px) {
+      .scs { padding: 0 5vw 2.5rem; }
+      .scs-stage { height: clamp(320px, 80vw, 420px); }
+      .scs-hero { width: min(340px, 88%); }
+      .scs-controls { gap: 1.1rem; margin: 1.2rem auto 1.6rem; }
+      .scs-arrow { width: 2.3rem; height: 2.3rem; }
+    }
+
+    /* Respeta reduce-motion */
+    @media (prefers-reduced-motion: reduce) {
+      .scs-hero-img, .scs-glow, .scs-dot, .scs-arrow { transition: none; }
+      .scs-detail.swap > * { animation: none; }
+    }
+
+    /* ══════════════════════════════════════
        SECTION 6 — SEASON TRANSITION
     ══════════════════════════════════════ */
     .s-transition {
@@ -2770,87 +2929,63 @@
       </p>
     </div>
 
-    <div class="swiper swiper-cocktail swiper-verano">
-      <div class="swiper-wrapper">
+    <div class="scs reveal" style="--delay:0.12s; --vibe:#E8731E;" id="summerShowcase">
 
-        <div class="swiper-slide">
-          <article class="cocktail-panel">
-            <img width="1022" height="943" src="drinksweetspritz.webp" alt="Sweet Spritz">
-            <div class="cp-info">
-              <h3 class="cp-name">Sweet Spritz</h3>
-              <p class="cp-base">Aperol</p>
-              <ul class="cp-ing">
-                <li>Champagne extra dulce</li>
-                <li>Naranja deshidratada</li>
-              </ul>
-            </div>
-          </article>
+      <!-- ESCENARIO: hero central + 4 previews flotantes alrededor -->
+      <div class="scs-stage">
+        <div class="scs-glow" aria-hidden="true"></div>
+
+        <div class="scs-hero">
+          <img class="scs-hero-img is-active" width="1022" height="943" src="drinksweetspritz.webp" alt="Sweet Spritz"
+               data-id="sweet-spritz" data-name="Sweet Spritz" data-base="Aperol" data-theme="#E8731E"
+               data-desc="Champagne extra dulce con un giro cítrico de naranja deshidratada. Un aperitivo luminoso para abrir la noche."
+               data-ing="Aperol|Champagne extra dulce|Naranja deshidratada">
+          <img class="scs-hero-img" width="1024" height="1024" src="drinksweetmimosa.webp" alt="Sweet Mimosa"
+               data-id="sweet-mimosa" data-name="Sweet Mimosa" data-base="Champagne" data-theme="#F2B544"
+               data-desc="Naranja natural recién sodificada y aceite cítrico sobre champagne. Fresco, brillante, eterno."
+               data-ing="Champagne|Soda stream de naranja natural|Aceite de naranja">
+          <img class="scs-hero-img" width="1023" height="943" src="drinkbloodyorange.webp" alt="Bloody Orange"
+               data-id="bloody-orange" data-name="Bloody Orange" data-base="Vodka de apio" data-theme="#D2461E"
+               data-desc="Vodka de apio, jugo de naranja y zanahoria y óleo de limón. Intenso, especiado y con carácter."
+               data-ing="Vodka de apio|Jugo de naranja y zanahoria|Óleo de limón|Orange pepper pintado">
+          <img class="scs-hero-img" width="1024" height="1024" src="drinkcosmo.webp" alt="CosmoPepper"
+               data-id="cosmo-pepper" data-name="CosmoPepper" data-base="Vodka" data-theme="#C0407A"
+               data-desc="Arándanos, limón y óleo de naranja con un borde de tajín. El cosmopolitan reinterpretado con pimienta."
+               data-ing="Vodka|Jugo de arándanos|Jugo de limón|Óleo de naranja|Tajín pintado">
+          <img class="scs-hero-img" width="677" height="677" src="margaritapepper.webp" alt="MargaritaPepper"
+               data-id="margarita-pepper" data-name="MargaritaPepper" data-base="Tequila" data-theme="#C7C23A"
+               data-desc="Tequila con sirup de naranja y limón, tajín y óleo cítrico. Equilibrio entre dulce, ácido y picante."
+               data-ing="Tequila|Sirup de naranja|Jugo de limón|Tajín y óleo cítrico">
         </div>
 
-        <div class="swiper-slide">
-          <article class="cocktail-panel">
-            <img width="1024" height="1024" src="drinksweetmimosa.webp" alt="Sweet Mimosa">
-            <div class="cp-info">
-              <h3 class="cp-name">Sweet Mimosa</h3>
-              <p class="cp-base">Champagne</p>
-              <ul class="cp-ing">
-                <li>Soda stream naranja natural</li>
-                <li>Aceite de naranja</li>
-              </ul>
-            </div>
-          </article>
-        </div>
-
-        <div class="swiper-slide">
-          <article class="cocktail-panel">
-            <img width="1023" height="943" src="drinkbloodyorange.webp" alt="Bloody Orange">
-            <div class="cp-info">
-              <h3 class="cp-name">Bloody Orange</h3>
-              <p class="cp-base">Vodka de apio</p>
-              <ul class="cp-ing">
-                <li>Jugo de naranja y zanahoria</li>
-                <li>Óleo de limón</li>
-                <li>Orange pepper pintado</li>
-              </ul>
-            </div>
-          </article>
-        </div>
-
-        <div class="swiper-slide">
-          <article class="cocktail-panel">
-            <img width="1024" height="1024" src="drinkcosmo.webp" alt="CosmoPepper">
-            <div class="cp-info">
-              <h3 class="cp-name">CosmoPepper</h3>
-              <p class="cp-base">Vodka</p>
-              <ul class="cp-ing">
-                <li>Jugo de arándanos</li>
-                <li>Jugo de limón</li>
-                <li>Óleo de naranja</li>
-                <li>Tajín pintado</li>
-              </ul>
-            </div>
-          </article>
-        </div>
-
-        <div class="swiper-slide">
-          <article class="cocktail-panel">
-            <img width="677" height="677" src="margaritapepper.webp" alt="MargaritaPepper">
-            <div class="cp-info">
-              <h3 class="cp-name">MargaritaPepper</h3>
-              <p class="cp-base">Tequila</p>
-              <ul class="cp-ing">
-                <li>Sirup de naranja</li>
-                <li>Jugo de limón</li>
-                <li>Tajín y óleo cítrico</li>
-              </ul>
-            </div>
-          </article>
+        <!-- PANEL DE DETALLE: flota a la derecha, superpuesto al hero -->
+        <div class="scs-detail">
+          <span class="scs-detail-base" id="scsBase">Aperol</span>
+          <h3 class="scs-detail-name" id="scsName" aria-live="polite">Sweet Spritz</h3>
+          <p class="scs-detail-desc" id="scsDesc">Champagne extra dulce con un giro cítrico de naranja deshidratada. Un aperitivo luminoso para abrir la noche.</p>
+          <ul class="scs-detail-ing" id="scsIng">
+            <li>Aperol</li><li>Champagne extra dulce</li><li>Naranja deshidratada</li>
+          </ul>
         </div>
 
       </div>
-      <div class="swiper-pagination"></div>
-      <div class="swiper-button-prev"></div>
-      <div class="swiper-button-next"></div>
+
+      <!-- CONTROLES: flecha · 5 puntitos · flecha -->
+      <div class="scs-controls" role="group" aria-label="Navegación de cócteles">
+        <button class="scs-arrow" type="button" id="scsPrevBtn" aria-label="Cóctel anterior">
+          <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="scs-dots" id="scsDots">
+          <button class="scs-dot" type="button" aria-label="Sweet Spritz"></button>
+          <button class="scs-dot" type="button" aria-label="Sweet Mimosa"></button>
+          <button class="scs-dot" type="button" aria-label="Bloody Orange"></button>
+          <button class="scs-dot" type="button" aria-label="CosmoPepper"></button>
+          <button class="scs-dot" type="button" aria-label="MargaritaPepper"></button>
+        </div>
+        <button class="scs-arrow" type="button" id="scsNextBtn" aria-label="Cóctel siguiente">
+          <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
     </div>
   </section>
 
@@ -3793,6 +3928,116 @@
             document.fonts.ready.then(forceRecenter);
           }
         });
+
+        /* ── CARTA VERANO — Summer Cocktail Showcase ──
+           Hero protagonista que rota cada 3.5 s (estilo hero de cine).
+           Navegación con flechas, puntitos o teclado; cambia el tema
+           de color (--vibe) y el detalle con transiciones lentas. */
+        (function () {
+          const scs = document.getElementById('summerShowcase');
+          if (!scs) return;
+          const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+          const heroImgs = Array.from(scs.querySelectorAll('.scs-hero-img'));
+          const data = heroImgs.map(im => ({
+            name:  im.dataset.name,
+            base:  im.dataset.base,
+            theme: im.dataset.theme,
+            desc:  im.dataset.desc,
+            ing:   im.dataset.ing.split('|'),
+            src:   im.getAttribute('src')
+          }));
+          const N = data.length;
+
+          const dots    = Array.from(scs.querySelectorAll('.scs-dot'));
+          const detail  = scs.querySelector('.scs-detail');
+          const elBase  = scs.querySelector('#scsBase');
+          const elName  = scs.querySelector('#scsName');
+          const elDesc  = scs.querySelector('#scsDesc');
+          const elIng   = scs.querySelector('#scsIng');
+
+          const DELAY = 3500;
+          let cur = 0, timer = null;
+
+          /* Detecta el color de fondo real de cada foto muestreando los
+             píxeles del borde (donde está el fondo, no el trago). Mismo
+             origen ⇒ el canvas se puede leer sin problema. */
+          const SZ = 28;
+          const cnv = document.createElement('canvas');
+          cnv.width = cnv.height = SZ;
+          const ctx = cnv.getContext('2d', { willReadFrequently: true });
+
+          function sampleBg(img) {
+            if (!img.complete || !img.naturalWidth) return null;
+            try { ctx.clearRect(0, 0, SZ, SZ); ctx.drawImage(img, 0, 0, SZ, SZ); }
+            catch (e) { return null; }
+            let px;
+            try { px = ctx.getImageData(0, 0, SZ, SZ).data; }
+            catch (e) { return null; }
+            const rs = [], gs = [], bs = [];
+            const push = (x, y) => { const i = (y * SZ + x) * 4; rs.push(px[i]); gs.push(px[i+1]); bs.push(px[i+2]); };
+            for (let x = 0; x < SZ; x++) { push(x, 0); push(x, SZ - 1); }
+            for (let y = 1; y < SZ - 1; y++) { push(0, y); push(SZ - 1, y); }
+            const med = arr => { arr.sort((a, b) => a - b); return arr[arr.length >> 1]; };
+            return 'rgb(' + med(rs) + ',' + med(gs) + ',' + med(bs) + ')';
+          }
+
+          function ensureBg(i) {
+            if (!data[i].bg) data[i].bg = sampleBg(heroImgs[i]);
+            return data[i].bg;
+          }
+          /* Calcular fondos a medida que cargan las imágenes */
+          heroImgs.forEach((im, i) => {
+            const run = () => { data[i].bg = sampleBg(im); if (i === cur && data[i].bg) scs.style.setProperty('--shot', data[i].bg); };
+            if (im.complete && im.naturalWidth) run();
+            else im.addEventListener('load', run, { once: true });
+          });
+
+          function render() {
+            heroImgs.forEach((im, i) => im.classList.toggle('is-active', i === cur));
+            const bg = ensureBg(cur);
+            if (bg) scs.style.setProperty('--shot', bg);
+            dots.forEach((d, i) => {
+              const on = i === cur;
+              d.classList.toggle('is-active', on);
+              d.setAttribute('aria-current', on ? 'true' : 'false');
+            });
+            const d = data[cur];
+            elBase.textContent = d.base;
+            elName.textContent = d.name;
+            elDesc.textContent = d.desc;
+            elIng.innerHTML    = d.ing.map(x => '<li>' + x + '</li>').join('');
+            scs.style.setProperty('--vibe', d.theme);
+
+            detail.classList.remove('swap');
+            void detail.offsetWidth;
+            detail.classList.add('swap');
+          }
+
+          function go(i) { cur = ((i % N) + N) % N; render(); }
+
+          function start() { if (reduce) return; stop(); timer = setInterval(() => go(cur + 1), DELAY); }
+          function stop()  { if (timer) { clearInterval(timer); timer = null; } }
+          /* navegación manual: salta y reinicia el reloj del autoplay */
+          function manual(i) { go(i); start(); }
+
+          render();
+          start();
+
+          dots.forEach((dot, i) => dot.addEventListener('click', () => manual(i)));
+          scs.querySelector('#scsPrevBtn').addEventListener('click', () => manual(cur - 1));
+          scs.querySelector('#scsNextBtn').addEventListener('click', () => manual(cur + 1));
+
+          /* Pausa mientras el usuario mira/lee; retoma al salir. */
+          scs.addEventListener('mouseenter', stop);
+          scs.addEventListener('mouseleave', start);
+
+          /* Teclado: ← / → */
+          scs.addEventListener('keydown', e => {
+            if (e.key === 'ArrowRight') { manual(cur + 1); e.preventDefault(); }
+            else if (e.key === 'ArrowLeft') { manual(cur - 1); e.preventDefault(); }
+          });
+        })();
       }
 
       /* ══════════════════════════════════════
